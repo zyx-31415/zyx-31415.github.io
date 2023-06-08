@@ -1,4 +1,4 @@
-baseURL = "zyx-31415.github.io"
+baseURL = "https://zyx-31415.github.io"
 languageCode = "zh-CN"
 title = "弈宇"
 theme = "maupassant"
