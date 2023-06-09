@@ -4,7 +4,7 @@ title = "弈宇"
 theme = "maupassant"
 googleAnalytics = ""  # UA-XXXXXXXX-X/G-XXXXXXXXXX
 
-publishDir = "D://code/github/zyx-31415.github.io/docs"
+publishDir = "D:/code/github/zyx-31415.github.io/docs"
 ## 保持分类的原始名字（false会做转小写处理）
 preserveTaxonomyNames = true
 ## 是否禁止URL Path转小写

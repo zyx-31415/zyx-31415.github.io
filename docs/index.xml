@@ -5,7 +5,35 @@
     <link>https://zyx-31415.github.io/</link>
     <description>Recent content on 弈宇</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>zh-CN</language><atom:link href="https://zyx-31415.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <language>zh-CN</language>
+    <lastBuildDate>Fri, 09 Jun 2023 08:31:28 +0800</lastBuildDate><atom:link href="https://zyx-31415.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Hello_world</title>
+      <link>https://zyx-31415.github.io/post/Hello_world/</link>
+      <pubDate>Fri, 09 Jun 2023 08:31:28 +0800</pubDate>
+      
+      <guid>https://zyx-31415.github.io/post/Hello_world/</guid>
+      <description>Hello world It&amp;rsquo;smy first blog</description>
+    </item>
+    
+    <item>
+      <title>test</title>
+      <link>https://zyx-31415.github.io/post/test/</link>
+      <pubDate>Fri, 13 Dec 2019 21:00:00 +0800</pubDate>
+      
+      <guid>https://zyx-31415.github.io/post/test/</guid>
+      <description>标题 段落内容 标题 段落内容 标题 段落内容 标题 段落内容 标题 段落内容</description>
+    </item>
+    
+    <item>
+      <title>关于我</title>
+      <link>https://zyx-31415.github.io/about/</link>
+      <pubDate>Tue, 10 Mar 2015 00:13:27 +0000</pubDate>
+      
+      <guid>https://zyx-31415.github.io/about/</guid>
+      <description>努力方向 Python AI Live2D</description>
+    </item>
+    
     <item>
       <title>归档</title>
       <link>https://zyx-31415.github.io/archives/</link>

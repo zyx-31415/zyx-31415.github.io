@@ -1,8 +1,8 @@
 ---
-title: "Hello_World"
-date: 2023-06-08T22:30:43+08:00
-draft: true
+title: "Hello_world"
+date: 2023-06-09T08:31:28+08:00
+draft: false
 ---
 
-# Hello World
-it's my first blog
+# Hello world
+It'smy first blog

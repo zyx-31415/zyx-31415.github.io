@@ -1,9 +1,9 @@
 ---
 title: "关于我"
-date: 2023-06-08 22:27:00
-description: 学生，努力学习各种语言中
+date: 2015-03-10 00:13:27
+description: 学生，学习各种计算机语言中
 ---
 # 努力方向
 ## Python
-## Live2D
 ## AI
+## Live2D
