@@ -2,20 +2,38 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://zyx-31415.github.io/post/Hello_world/</loc>
-    <lastmod>2023-06-09T08:31:28+08:00</lastmod>
+    <loc>https://zyx-31415.github.io/categories/</loc>
+    <lastmod>2023-06-15T06:16:27+08:00</lastmod>
+  </url><url>
+    <loc>https://zyx-31415.github.io/categories/code/</loc>
+    <lastmod>2023-06-15T06:16:27+08:00</lastmod>
+  </url><url>
+    <loc>https://zyx-31415.github.io/tags/conda/</loc>
+    <lastmod>2023-06-15T06:16:27+08:00</lastmod>
   </url><url>
     <loc>https://zyx-31415.github.io/post/</loc>
-    <lastmod>2023-06-09T08:31:28+08:00</lastmod>
-  </url><url>
-    <loc>https://zyx-31415.github.io/</loc>
-    <lastmod>2023-06-09T08:31:28+08:00</lastmod>
-  </url><url>
-    <loc>https://zyx-31415.github.io/categories/</loc>
-    <lastmod>2019-12-13T21:00:00+08:00</lastmod>
+    <lastmod>2023-06-15T06:16:27+08:00</lastmod>
   </url><url>
     <loc>https://zyx-31415.github.io/tags/</loc>
-    <lastmod>2019-12-13T21:00:00+08:00</lastmod>
+    <lastmod>2023-06-15T06:16:27+08:00</lastmod>
+  </url><url>
+    <loc>https://zyx-31415.github.io/tags/vscode/</loc>
+    <lastmod>2023-06-15T06:16:27+08:00</lastmod>
+  </url><url>
+    <loc>https://zyx-31415.github.io/post/vscode%E5%8F%8Aconda%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE/</loc>
+    <lastmod>2023-06-15T06:16:27+08:00</lastmod>
+  </url><url>
+    <loc>https://zyx-31415.github.io/tags/%E5%B0%8F%E7%99%BD/</loc>
+    <lastmod>2023-06-15T06:16:27+08:00</lastmod>
+  </url><url>
+    <loc>https://zyx-31415.github.io/</loc>
+    <lastmod>2023-06-15T06:16:27+08:00</lastmod>
+  </url><url>
+    <loc>https://zyx-31415.github.io/tags/%E7%8E%AF%E5%A2%83%E5%AE%89%E8%A3%85/</loc>
+    <lastmod>2023-06-15T06:16:27+08:00</lastmod>
+  </url><url>
+    <loc>https://zyx-31415.github.io/post/Hello_world/</loc>
+    <lastmod>2023-06-09T08:31:28+08:00</lastmod>
   </url><url>
     <loc>https://zyx-31415.github.io/tags/test/</loc>
     <lastmod>2019-12-13T21:00:00+08:00</lastmod>

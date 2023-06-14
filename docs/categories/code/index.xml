@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Posts on 弈宇</title>
-    <link>https://zyx-31415.github.io/post/</link>
-    <description>Recent content in Posts on 弈宇</description>
+    <title>code on 弈宇</title>
+    <link>https://zyx-31415.github.io/categories/code/</link>
+    <description>Recent content in code on 弈宇</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-CN</language>
-    <lastBuildDate>Thu, 15 Jun 2023 06:16:27 +0800</lastBuildDate><atom:link href="https://zyx-31415.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 15 Jun 2023 06:16:27 +0800</lastBuildDate><atom:link href="https://zyx-31415.github.io/categories/code/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Vscode及conda超小白环境配置教程</title>
       <link>https://zyx-31415.github.io/post/vscode%E5%8F%8Aconda%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE/</link>
@@ -14,24 +14,6 @@
       
       <guid>https://zyx-31415.github.io/post/vscode%E5%8F%8Aconda%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE/</guid>
       <description>vscode及conda超小白环境配置教程 最近买了台新电脑，所以不得不重装一下环境，又由于没用过vscode，所以碰上了一点弯路，略微记录一下 小白们也可以看看这个教程，应该还算完善吧(没有丝毫信心) (注意:全程无图) (有时间我再配吧，实在不想再装一遍了) vscode 首先，自然是下载安装包了</description>
-    </item>
-    
-    <item>
-      <title>Hello_world</title>
-      <link>https://zyx-31415.github.io/post/Hello_world/</link>
-      <pubDate>Fri, 09 Jun 2023 08:31:28 +0800</pubDate>
-      
-      <guid>https://zyx-31415.github.io/post/Hello_world/</guid>
-      <description>Hello world It&amp;rsquo;smy first blog</description>
-    </item>
-    
-    <item>
-      <title>test</title>
-      <link>https://zyx-31415.github.io/post/test/</link>
-      <pubDate>Fri, 13 Dec 2019 21:00:00 +0800</pubDate>
-      
-      <guid>https://zyx-31415.github.io/post/test/</guid>
-      <description>标题 段落内容 标题 段落内容 标题 段落内容 标题 段落内容 标题 段落内容</description>
     </item>
     
   </channel>
