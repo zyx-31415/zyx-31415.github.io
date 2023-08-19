@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>code on 弈宇</title>
-    <link>https://zyx-31415.github.io/categories/code/</link>
-    <description>Recent content in code on 弈宇</description>
+    <title>txt转epub on 弈宇</title>
+    <link>https://zyx-31415.github.io/tags/txt%E8%BD%ACepub/</link>
+    <description>Recent content in txt转epub on 弈宇</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-CN</language>
-    <lastBuildDate>Sat, 19 Aug 2023 11:11:03 +0800</lastBuildDate><atom:link href="https://zyx-31415.github.io/categories/code/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 19 Aug 2023 11:11:03 +0800</lastBuildDate><atom:link href="https://zyx-31415.github.io/tags/txt%E8%BD%ACepub/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>关于使用ebooklib进行多个txt转epub及epub合并与追加时遇到的小问题</title>
       <link>https://zyx-31415.github.io/post/%E5%85%B3%E4%BA%8E%E4%BD%BF%E7%94%A8ebooklib%E8%BF%9B%E8%A1%8C%E5%A4%9A%E4%B8%AAtxt%E8%BD%ACepub%E5%8F%8Aepub%E5%90%88%E5%B9%B6%E4%B8%8E%E8%BF%BD%E5%8A%A0%E6%97%B6%E9%81%87%E5%88%B0%E7%9A%84%E5%B0%8F%E9%97%AE%E9%A2%98/</link>
@@ -14,15 +14,6 @@
       
       <guid>https://zyx-31415.github.io/post/%E5%85%B3%E4%BA%8E%E4%BD%BF%E7%94%A8ebooklib%E8%BF%9B%E8%A1%8C%E5%A4%9A%E4%B8%AAtxt%E8%BD%ACepub%E5%8F%8Aepub%E5%90%88%E5%B9%B6%E4%B8%8E%E8%BF%BD%E5%8A%A0%E6%97%B6%E9%81%87%E5%88%B0%E7%9A%84%E5%B0%8F%E9%97%AE%E9%A2%98/</guid>
       <description>23-08-19_关于使用ebooklib进行多个txt转epub及epub合并与追加时遇到的小问题 前言 不记得是半个月还是一个月之前，我下了一些短篇小说(当然，数量挺多)，如果导入我的电纸书，那场面，锣鼓喧天，鞭炮齐鸣，红旗招展，人山人海(其实就是会出现上百页，不好归档，笑)。所</description>
-    </item>
-    
-    <item>
-      <title>Vscode及conda超小白环境配置教程</title>
-      <link>https://zyx-31415.github.io/post/vscode%E5%8F%8Aconda%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE/</link>
-      <pubDate>Thu, 15 Jun 2023 06:16:27 +0800</pubDate>
-      
-      <guid>https://zyx-31415.github.io/post/vscode%E5%8F%8Aconda%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE/</guid>
-      <description>vscode及conda超小白环境配置教程 最近买了台新电脑，所以不得不重装一下环境，又由于没用过vscode，所以碰上了一点弯路，略微记录一下 小白们也可以看看这个教程，应该还算完善吧(没有丝毫信心) (注意:全程无图) (有时间我再配吧，实在不想再装一遍了) vscode 首先，自然是下载安装包了</description>
     </item>
     
   </channel>

@@ -1,0 +1,1416 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    
+
+    <title>关于使用ebooklib进行多个txt转epub及epub合并与追加时遇到的小问题 | 弈宇</title>
+    <meta property="og:title" content="关于使用ebooklib进行多个txt转epub及epub合并与追加时遇到的小问题 - 弈宇">
+    <meta property="og:type" content="article">
+        
+    <meta property="article:published_time" content='2023-08-19T11:11:03&#43;08:00'>
+        
+        
+    <meta property="article:modified_time" content='2023-08-19T11:11:03&#43;08:00'>
+        
+    <meta name="Keywords" content="Live2D,python,AI,深度学习">
+    <meta name="description" content="关于使用ebooklib进行多个txt转epub及epub合并与追加时遇到的小问题">
+        
+    <meta name="author" content="弈宇者">
+    <meta property="og:url" content="https://zyx-31415.github.io/post/%E5%85%B3%E4%BA%8E%E4%BD%BF%E7%94%A8ebooklib%E8%BF%9B%E8%A1%8C%E5%A4%9A%E4%B8%AAtxt%E8%BD%ACepub%E5%8F%8Aepub%E5%90%88%E5%B9%B6%E4%B8%8E%E8%BF%BD%E5%8A%A0%E6%97%B6%E9%81%87%E5%88%B0%E7%9A%84%E5%B0%8F%E9%97%AE%E9%A2%98/">
+    <link rel="shortcut icon" href='/favicon.ico'  type="image/x-icon">
+
+    <link rel="stylesheet" href='/css/normalize.css'>
+    <link rel="stylesheet" href='/css/style.css'>
+    <script type="text/javascript" src="//cdn.bootcdn.net/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    
+    
+    
+    
+    
+    
+        <link rel="stylesheet" href='/css/douban.css'>
+    
+        <link rel="stylesheet" href='/css/other.css'>
+    
+</head>
+
+<body>
+    <header id="header" class="clearfix">
+    <div class="container">
+        <div class="col-group">
+            <div class="site-name ">
+                
+                    <a id="logo" href="https://zyx-31415.github.io">
+                        弈宇
+                    </a>
+                
+                <p class="description">学习各种计算机语言中</p>
+            </div>
+            <div>
+                <nav id="nav-menu" class="clearfix">
+                    <a class="current" href="https://zyx-31415.github.io">Home</a>
+                    
+                    <a  href="https://zyx-31415.github.io/archives/" title="归档">归档</a>
+                    
+                    <a  href="https://zyx-31415.github.io/about/" title="关于">关于</a>
+                    
+                </nav>
+            </div>
+        </div>
+    </div>
+</header>
+
+    <div id="body">
+        <div class="container">
+            <div class="col-group">
+
+                <div class="col-8" id="main">
+                    
+<div class="res-cons">
+    <style type="text/css">
+    .post-toc {
+        position: fixed;
+        width: 200px;
+        margin-left: -210px;
+        padding: 5px 10px;
+        font-family: Athelas, STHeiti, Microsoft Yahei, serif;
+        font-size: 12px;
+        border: 1px solid rgba(0, 0, 0, .07);
+        border-radius: 5px;
+        background-color: rgba(255, 255, 255, 0.98);
+        background-clip: padding-box;
+        -webkit-box-shadow: 1px 1px 2px rgba(0, 0, 0, .125);
+        box-shadow: 1px 1px 2px rgba(0, 0, 0, .125);
+        word-wrap: break-word;
+        white-space: nowrap;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+        z-index: 999;
+        cursor: pointer;
+        max-height: 70%;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    .post-toc .post-toc-title {
+        width: 100%;
+        margin: 0 auto;
+        font-size: 20px;
+        font-weight: 400;
+        text-transform: uppercase;
+        text-align: center;
+    }
+
+    .post-toc .post-toc-content {
+        font-size: 15px;
+    }
+
+    .post-toc .post-toc-content>nav>ul {
+        margin: 10px 0;
+    }
+
+    .post-toc .post-toc-content ul {
+        padding-left: 20px;
+        list-style: square;
+        margin: 0.5em;
+        line-height: 1.8em;
+    }
+
+    .post-toc .post-toc-content ul ul {
+        padding-left: 15px;
+        display: none;
+    }
+
+    @media print,
+    screen and (max-width:1057px) {
+        .post-toc {
+            display: none;
+        }
+    }
+</style>
+<div class="post-toc" style="position: absolute; top: 188px;">
+    <h2 class="post-toc-title">Table of Contents</h2>
+    <div class="post-toc-content">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#txt转epub">txt转epub</a></li>
+    <li><a href="#合并epub">合并epub</a></li>
+    <li><a href="#追加epub文件">追加epub文件</a></li>
+  </ul>
+</nav>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        var postToc = $(".post-toc");
+        if (postToc.length) {
+            var leftPos = $("#main").offset().left;
+            if (leftPos < 220) {
+                postToc.css({ "width": leftPos - 10, "margin-left": (0 - leftPos) })
+            }
+
+            var t = postToc.offset().top - 20,
+                a = {
+                    start: {
+                        position: "absolute",
+                        top: t
+                    },
+                    process: {
+                        position: "fixed",
+                        top: 20
+                    },
+                };
+            $(window).scroll(function () {
+                var e = $(window).scrollTop();
+                e < t ? postToc.css(a.start) : postToc.css(a.process)
+            })
+        }
+
+        if ($("#TableOfContents").children().length < 1) {
+            $(".post-toc").remove();
+        }
+    })
+</script>
+    <article class="post">
+        <header>
+            <h1 class="post-title">关于使用ebooklib进行多个txt转epub及epub合并与追加时遇到的小问题</h1>
+        </header>
+        
+  <time datetime="2023-08-19T03:11:03Z" class="post-meta meta-date dt-published">
+    2023-08-19
+  </time>
+
+
+<div class="post-meta meta-category">
+  <span>&nbsp;|</span>
+  
+    <a href='/categories/code' target="_blank">code</a>
+  
+</div>
+
+
+        
+        <div class="post-meta">
+            <span id="busuanzi_container_page_pv">&nbsp;|
+                <span id="busuanzi_value_page_pv"></span> <span>reads</span>
+            </span>
+        </div>
+        
+        
+        <div class="post-content">
+            <h1 id="23-08-19_关于使用ebooklib进行多个txt转epub及epub合并与追加时遇到的小问题">23-08-19_关于使用ebooklib进行多个txt转epub及epub合并与追加时遇到的小问题</h1>
+<h1 id="前言">前言</h1>
+<p>不记得是半个月还是一个月之前，我下了一些短篇小说(当然，数量挺多)，如果导入我的电纸书，那场面，锣鼓喧天，鞭炮齐鸣，红旗招展，人山人海(其实就是会出现上百页，不好归档，笑)。所以我能忍吗，我刚学的python(其实学了好久，头发一掉一大把)。还搞不定你这小家伙。开搞</p>
+<h1 id="正文">正文</h1>
+<h2 id="txt转epub">txt转epub</h2>
+<p>先介绍一下我的文件的结构</p>
+<p>标题.txt</p>
+<pre><code>内容为正文，不带其他内容
+</code></pre>
+<p>好了，开始编写</p>
+<p>首先，导入库</p>
+<p>​<code>from ebooklib import epub</code>​</p>
+<p>然后，新建一个epub对象
+​<code>book = epub.EpubBook()</code>​</p>
+<p>接着，设置一下元信息</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>	book<span style="color:#000;font-weight:bold">.</span>set_identifier(<span style="color:#d14">&#34;这里是id&#34;</span>) <span style="color:#998;font-style:italic">#注意，格式为&#39;id+数字&#39;</span>
+</span></span><span style="display:flex;"><span>	book<span style="color:#000;font-weight:bold">.</span>set_title(<span style="color:#d14">&#34;这里设置标题&#34;</span>)
+</span></span><span style="display:flex;"><span>	book<span style="color:#000;font-weight:bold">.</span>set_language(<span style="color:#d14">&#34;cn&#34;</span>)
+</span></span><span style="display:flex;"><span>	book<span style="color:#000;font-weight:bold">.</span>add_author(<span style="color:#d14">&#34;这里设置作者&#34;</span>)
+</span></span><span style="display:flex;"><span>	book<span style="color:#000;font-weight:bold">.</span>add_metadata(<span style="color:#d14">&#34;DC&#34;</span>, <span style="color:#d14">&#34;description&#34;</span>)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>接下来，设置一下样式，作为一个懒人，自然是用默认的啦</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>    style <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#39;body { font-family: Times, Times New Roman, serif; }&#39;</span>
+</span></span><span style="display:flex;"><span>    nav_css <span style="color:#000;font-weight:bold">=</span> epub<span style="color:#000;font-weight:bold">.</span>EpubItem(uid<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;style_nav&#34;</span>,
+</span></span><span style="display:flex;"><span>                            file_name<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;style/nav.css&#34;</span>,
+</span></span><span style="display:flex;"><span>                            media_type<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;text/css&#34;</span>,
+</span></span><span style="display:flex;"><span>                            content<span style="color:#000;font-weight:bold">=</span>style)
+</span></span><span style="display:flex;"><span>    book<span style="color:#000;font-weight:bold">.</span>add_item(nav_css)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>(敲黑板)现在，重点来了，在写代码之前，我们得了解一下epub文件的结构</p>
+<p>epub文件可以看作一个zip文件，结构是这样的</p>
+<p>example.epub</p>
+<p>&ndash; EPUB</p>
+<pre><code>-- 001.xhtml
+
+-- 002.xhtml
+
+-- ...... .xhtml
+
+-- nav.xhtml
+
+-- style
+
+	-- nav.css
+</code></pre>
+<p>&ndash; META-INF</p>
+<pre><code>--元信息文件
+</code></pre>
+<p>其中，META-INF这个文件夹暂时不用考虑，主要看EPUB文件夹</p>
+<p>001.xhtml之类的xhtml文件是每一章的标题及内容</p>
+<p>而nav.xhtml便是我们的目录，其中包含了每一个章节的标题及指向的xhtml文件</p>
+<p>但是我们拥有的只有txt文件，而epub转换的时候需要HTML格式的，我们该如何做呢？</p>
+<p>简单，加一下<code>&lt;h1&gt;</code>和<code>&lt;p&gt;</code>标签就好了</p>
+<p>具体代码如下</p>
+<p>首先，读取文件</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">def</span> <span style="color:#900;font-weight:bold">_read_txt</span>(txt_name):  <span style="color:#998;font-style:italic"># 读取TXT</span>
+</span></span><span style="display:flex;"><span>    	<span style="color:#000;font-weight:bold">with</span> <span style="color:#0086b3">open</span>(txt_name, <span style="color:#d14">&#39;r&#39;</span>, encoding<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#39;utf-8&#39;</span>) <span style="color:#000;font-weight:bold">as</span> txt:
+</span></span><span style="display:flex;"><span>    	    txt_condent <span style="color:#000;font-weight:bold">=</span> txt<span style="color:#000;font-weight:bold">.</span>read()
+</span></span><span style="display:flex;"><span>    	    <span style="color:#000;font-weight:bold">pass</span>
+</span></span><span style="display:flex;"><span>    	<span style="color:#000;font-weight:bold">return</span> txt_condent
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>当然，还得获得一下绝对路径下的文件路径</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">def</span> <span style="color:#900;font-weight:bold">_t_files</span>(path):  <span style="color:#998;font-style:italic"># 查找单一文件夹下所有文件与子文件夹</span>
+</span></span><span style="display:flex;"><span>    	dirs <span style="color:#000;font-weight:bold">=</span> []
+</span></span><span style="display:flex;"><span>    	files <span style="color:#000;font-weight:bold">=</span> []
+</span></span><span style="display:flex;"><span>    	<span style="color:#000;font-weight:bold">for</span> item <span style="color:#000;font-weight:bold">in</span> os<span style="color:#000;font-weight:bold">.</span>scandir(path):
+</span></span><span style="display:flex;"><span>        	<span style="color:#000;font-weight:bold">if</span> item<span style="color:#000;font-weight:bold">.</span>is_dir():
+</span></span><span style="display:flex;"><span>            	dirs<span style="color:#000;font-weight:bold">.</span>append(item<span style="color:#000;font-weight:bold">.</span>path)
+</span></span><span style="display:flex;"><span>         	   <span style="color:#000;font-weight:bold">pass</span>
+</span></span><span style="display:flex;"><span>     	   <span style="color:#000;font-weight:bold">elif</span> item<span style="color:#000;font-weight:bold">.</span>is_file():
+</span></span><span style="display:flex;"><span>    	        files<span style="color:#000;font-weight:bold">.</span>append(item<span style="color:#000;font-weight:bold">.</span>path)
+</span></span><span style="display:flex;"><span>     	   <span style="color:#000;font-weight:bold">pass</span>
+</span></span><span style="display:flex;"><span>    	<span style="color:#000;font-weight:bold">return</span> dirs, files
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>由于为了准确，写的是绝对路径，所以还得分一下文件名，以便获取标题</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">def</span> <span style="color:#900;font-weight:bold">_get_title</span>(<span style="color:#0086b3">dir</span>):  <span style="color:#998;font-style:italic"># 获得绝对路径下的文件名</span>
+</span></span><span style="display:flex;"><span>    	t_title <span style="color:#000;font-weight:bold">=</span> <span style="color:#0086b3">dir</span><span style="color:#000;font-weight:bold">.</span>split(<span style="color:#d14">&#39;</span><span style="color:#d14">\\</span><span style="color:#d14">&#39;</span>)[<span style="color:#000;font-weight:bold">-</span><span style="color:#099">1</span>]<span style="color:#000;font-weight:bold">.</span>split(<span style="color:#d14">&#39;.&#39;</span>)[<span style="color:#099">0</span>]
+</span></span><span style="display:flex;"><span>    	<span style="color:#000;font-weight:bold">return</span> t_title
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>可以转化HTML格式了</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">9
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">def</span> <span style="color:#900;font-weight:bold">_txt2html</span>(txt_name):  <span style="color:#998;font-style:italic"># TXT转单个章节</span>
+</span></span><span style="display:flex;"><span>    	txt_condent <span style="color:#000;font-weight:bold">=</span> _read_txt(txt_name)  <span style="color:#998;font-style:italic"># 读取txt内容</span>
+</span></span><span style="display:flex;"><span>    	txt_condent_list <span style="color:#000;font-weight:bold">=</span> txt_condent<span style="color:#000;font-weight:bold">.</span>split(<span style="color:#d14">&#39;</span><span style="color:#d14">\n</span><span style="color:#d14">&#39;</span>)  <span style="color:#998;font-style:italic"># 分段</span>
+</span></span><span style="display:flex;"><span>    	text_name <span style="color:#000;font-weight:bold">=</span> _get_title(txt_name)  <span style="color:#998;font-style:italic"># 获取文件名</span>
+</span></span><span style="display:flex;"><span>    	txt_html <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#39;&lt;h1&gt;&#39;</span> <span style="color:#000;font-weight:bold">+</span> text_name <span style="color:#000;font-weight:bold">+</span> <span style="color:#d14">&#39;&lt;/h1&gt;&#39;</span>  <span style="color:#998;font-style:italic"># 设置标题</span>
+</span></span><span style="display:flex;"><span>    	<span style="color:#998;font-style:italic"># print(txt_condent_list)</span>
+</span></span><span style="display:flex;"><span>    	<span style="color:#000;font-weight:bold">for</span> temp <span style="color:#000;font-weight:bold">in</span> txt_condent_list:
+</span></span><span style="display:flex;"><span>        	txt_html <span style="color:#000;font-weight:bold">+=</span> <span style="color:#d14">&#39;&lt;p&gt;&#39;</span> <span style="color:#000;font-weight:bold">+</span> temp <span style="color:#000;font-weight:bold">+</span> <span style="color:#d14">&#39;&lt;/p&gt;&#39;</span>  <span style="color:#998;font-style:italic"># 段落转HTML格式</span>
+</span></span><span style="display:flex;"><span>    	<span style="color:#000;font-weight:bold">return</span> text_name, txt_html
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>接下来便是添加章节对象</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>    chaplist <span style="color:#000;font-weight:bold">=</span> [] <span style="color:#998;font-style:italic">#初始化章节列表</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">for</span> i <span style="color:#000;font-weight:bold">in</span> <span style="color:#0086b3">range</span>(<span style="color:#0086b3">len</span>(txt_file_line)):
+</span></span><span style="display:flex;"><span>        title, html <span style="color:#000;font-weight:bold">=</span> _txt2html(txt_file_line[i]) <span style="color:#998;font-style:italic">#获得标题以及转化为HTML格式的正文</span>
+</span></span><span style="display:flex;"><span>        chap <span style="color:#000;font-weight:bold">=</span> epub<span style="color:#000;font-weight:bold">.</span>EpubHtml(title<span style="color:#000;font-weight:bold">=</span>title,
+</span></span><span style="display:flex;"><span>                             file_name<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#39;00</span><span style="color:#d14">{}</span><span style="color:#d14">.xhtml&#39;</span><span style="color:#000;font-weight:bold">.</span>format(i), <span style="color:#998;font-style:italic">#这里是设置xhtml文件的名称，记住，xhtml的文件名是唯一的</span>
+</span></span><span style="display:flex;"><span>                             lang<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#39;cn&#39;</span>,
+</span></span><span style="display:flex;"><span>                             content<span style="color:#000;font-weight:bold">=</span>html)
+</span></span><span style="display:flex;"><span>        chaplist<span style="color:#000;font-weight:bold">.</span>append(chap)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>现在，我们有了一个装满章节的列表，可以开始设置目录了</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>    <span style="color:#998;font-style:italic"># 把所有chapters导入book里，并添加目录和书脊</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">for</span> chap <span style="color:#000;font-weight:bold">in</span> chaplist:
+</span></span><span style="display:flex;"><span>        book<span style="color:#000;font-weight:bold">.</span>add_item(chap)
+</span></span><span style="display:flex;"><span>    book<span style="color:#000;font-weight:bold">.</span>toc <span style="color:#000;font-weight:bold">=</span> chaplist
+</span></span><span style="display:flex;"><span>    book<span style="color:#000;font-weight:bold">.</span>spine <span style="color:#000;font-weight:bold">=</span> chaplist
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic"># 添加默认的 NCX and Nav file</span>
+</span></span><span style="display:flex;"><span>    book<span style="color:#000;font-weight:bold">.</span>add_item(epub<span style="color:#000;font-weight:bold">.</span>EpubNcx())
+</span></span><span style="display:flex;"><span>    book<span style="color:#000;font-weight:bold">.</span>add_item(epub<span style="color:#000;font-weight:bold">.</span>EpubNav())
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>最后，别忘了保存</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>    <span style="color:#998;font-style:italic"># 保存</span>
+</span></span><span style="display:flex;"><span>    epub<span style="color:#000;font-weight:bold">.</span>write_epub(<span style="color:#d14">&#39;./&#39;</span><span style="color:#000;font-weight:bold">+</span><span style="color:#d14">&#39;epub_abc.epub&#39;</span>, book)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>好了，我们可以将一群txt文件合并为epub文件了</p>
+<p>接下来我们要说说如何合并及追加epub文件了</p>
+<h2 id="合并epub">合并epub</h2>
+<p>源代码如下</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">36
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">37
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">38
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">39
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">40
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">41
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">42
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">43
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">44
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">45
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">46
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">47
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">48
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">49
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">50
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">51
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">52
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">53
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">54
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">55
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">56
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">57
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">58
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">59
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">60
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">61
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">62
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">63
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">64
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">65
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">66
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">67
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">68
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">69
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">70
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">71
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">72
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">73
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">74
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>		<span style="color:#998;font-style:italic"># 导入模块</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">import</span> <span style="color:#555">ebooklib</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">from</span> <span style="color:#555">ebooklib</span> <span style="color:#000;font-weight:bold">import</span> epub
+</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">from</span> <span style="color:#555">bs4</span> <span style="color:#000;font-weight:bold">import</span> BeautifulSoup
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">def</span> <span style="color:#900;font-weight:bold">_new_book</span>(time):
+</span></span><span style="display:flex;"><span>    		<span style="color:#998;font-style:italic"># 创建EpubBook</span>
+</span></span><span style="display:flex;"><span>    		book <span style="color:#000;font-weight:bold">=</span> epub<span style="color:#000;font-weight:bold">.</span>EpubBook()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  	    	<span style="color:#998;font-style:italic"># 设置书籍基本信息</span>
+</span></span><span style="display:flex;"><span> 	   		book<span style="color:#000;font-weight:bold">.</span>set_identifier(<span style="color:#d14">&#39;id&#39;</span> <span style="color:#000;font-weight:bold">+</span> time)
+</span></span><span style="display:flex;"><span>  	   		book<span style="color:#000;font-weight:bold">.</span>set_title(<span style="color:#d14">&#39;epub_&#39;</span> <span style="color:#000;font-weight:bold">+</span> time)
+</span></span><span style="display:flex;"><span> 	   		book<span style="color:#000;font-weight:bold">.</span>set_language(<span style="color:#d14">&#39;cn&#39;</span>)
+</span></span><span style="display:flex;"><span>    		book<span style="color:#000;font-weight:bold">.</span>add_author(<span style="color:#d14">&#39;writer&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    		<span style="color:#998;font-style:italic"># 添加样式表</span>
+</span></span><span style="display:flex;"><span>    		style <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#39;body {font-family: Times, Times New Roman, serif;}&#39;</span>
+</span></span><span style="display:flex;"><span>    		nav_css <span style="color:#000;font-weight:bold">=</span> epub<span style="color:#000;font-weight:bold">.</span>EpubItem(
+</span></span><span style="display:flex;"><span>        	uid<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#39;nav_css&#39;</span>, file_name<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#39;style/nav.css&#39;</span>, media_type<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#39;text/css&#39;</span>, content<span style="color:#000;font-weight:bold">=</span>style)
+</span></span><span style="display:flex;"><span>    		book<span style="color:#000;font-weight:bold">.</span>add_item(nav_css)
+</span></span><span style="display:flex;"><span>    		<span style="color:#000;font-weight:bold">return</span> book
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">def</span> <span style="color:#900;font-weight:bold">_read_book</span>(book_dir):
+</span></span><span style="display:flex;"><span>    	<span style="color:#998;font-style:italic"># 读取旧EPUB书籍</span>
+</span></span><span style="display:flex;"><span>    	old_book <span style="color:#000;font-weight:bold">=</span> epub<span style="color:#000;font-weight:bold">.</span>read_epub(book_dir)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    	<span style="color:#998;font-style:italic"># 过滤掉旧书中的nav.html</span>
+</span></span><span style="display:flex;"><span>    	docs <span style="color:#000;font-weight:bold">=</span> [item <span style="color:#000;font-weight:bold">for</span> item <span style="color:#000;font-weight:bold">in</span> old_book<span style="color:#000;font-weight:bold">.</span>get_items_of_type(
+</span></span><span style="display:flex;"><span>        ebooklib<span style="color:#000;font-weight:bold">.</span>ITEM_DOCUMENT) <span style="color:#000;font-weight:bold">if</span> item<span style="color:#000;font-weight:bold">.</span>file_name <span style="color:#000;font-weight:bold">!=</span> <span style="color:#d14">&#39;nav.xhtml&#39;</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    	<span style="color:#998;font-style:italic"># 将文档转换为EpubHtml添加到列表</span>
+</span></span><span style="display:flex;"><span>    	chaplist <span style="color:#000;font-weight:bold">=</span> []
+</span></span><span style="display:flex;"><span>    	<span style="color:#000;font-weight:bold">for</span> doc <span style="color:#000;font-weight:bold">in</span> docs:
+</span></span><span style="display:flex;"><span>        	<span style="color:#000;font-weight:bold">if</span> doc<span style="color:#000;font-weight:bold">.</span>media_type <span style="color:#000;font-weight:bold">==</span> <span style="color:#d14">&#39;application/xhtml+xml&#39;</span>:
+</span></span><span style="display:flex;"><span>            	<span style="color:#998;font-style:italic"># print(doc.title)</span>
+</span></span><span style="display:flex;"><span>            	contect <span style="color:#000;font-weight:bold">=</span> doc<span style="color:#000;font-weight:bold">.</span>content
+</span></span><span style="display:flex;"><span>            	soup <span style="color:#000;font-weight:bold">=</span> BeautifulSoup(contect, <span style="color:#d14">&#34;html.parser&#34;</span>)
+</span></span><span style="display:flex;"><span>            	title <span style="color:#000;font-weight:bold">=</span> soup<span style="color:#000;font-weight:bold">.</span>find(<span style="color:#d14">&#39;title&#39;</span>)<span style="color:#000;font-weight:bold">.</span>text
+</span></span><span style="display:flex;"><span>            	chap <span style="color:#000;font-weight:bold">=</span> epub<span style="color:#000;font-weight:bold">.</span>EpubHtml(
+</span></span><span style="display:flex;"><span>                title<span style="color:#000;font-weight:bold">=</span>title, file_name<span style="color:#000;font-weight:bold">=</span>doc<span style="color:#000;font-weight:bold">.</span>file_name, lang<span style="color:#000;font-weight:bold">=</span>doc<span style="color:#000;font-weight:bold">.</span>lang, content<span style="color:#000;font-weight:bold">=</span>contect)
+</span></span><span style="display:flex;"><span>            	chaplist<span style="color:#000;font-weight:bold">.</span>append(chap)
+</span></span><span style="display:flex;"><span>    	<span style="color:#000;font-weight:bold">return</span> chaplist
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">def</span> <span style="color:#900;font-weight:bold">_write_book</span>(chaplist, book, time):
+</span></span><span style="display:flex;"><span>    	<span style="color:#998;font-style:italic"># 添加所有章节文档</span>
+</span></span><span style="display:flex;"><span>    	<span style="color:#000;font-weight:bold">for</span> chap <span style="color:#000;font-weight:bold">in</span> chaplist:
+</span></span><span style="display:flex;"><span>        	book<span style="color:#000;font-weight:bold">.</span>add_item(chap)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    	<span style="color:#998;font-style:italic"># 设置书籍目录和导航</span>
+</span></span><span style="display:flex;"><span>    	book<span style="color:#000;font-weight:bold">.</span>toc <span style="color:#000;font-weight:bold">=</span> chaplist
+</span></span><span style="display:flex;"><span>    	book<span style="color:#000;font-weight:bold">.</span>spine <span style="color:#000;font-weight:bold">=</span> chaplist
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    	<span style="color:#998;font-style:italic"># 添加NCX和导航文件</span>
+</span></span><span style="display:flex;"><span>    	book<span style="color:#000;font-weight:bold">.</span>add_item(epub<span style="color:#000;font-weight:bold">.</span>EpubNcx())
+</span></span><span style="display:flex;"><span>    	book<span style="color:#000;font-weight:bold">.</span>add_item(epub<span style="color:#000;font-weight:bold">.</span>EpubNav())
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    	<span style="color:#998;font-style:italic"># 生成EPUB文件</span>
+</span></span><span style="display:flex;"><span>    	epub<span style="color:#000;font-weight:bold">.</span>write_epub(<span style="color:#d14">&#39;h_epub_&#39;</span> <span style="color:#000;font-weight:bold">+</span> time <span style="color:#000;font-weight:bold">+</span> <span style="color:#d14">&#39;.epub&#39;</span>, book)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">def</span> <span style="color:#900;font-weight:bold">_merge_epub</span>(f_book_dir, s_book_dir, time):
+</span></span><span style="display:flex;"><span>    	n_book <span style="color:#000;font-weight:bold">=</span> _new_book(time)
+</span></span><span style="display:flex;"><span>    	f_chaplist <span style="color:#000;font-weight:bold">=</span> _read_book(f_book_dir)
+</span></span><span style="display:flex;"><span>    	len_f_c <span style="color:#000;font-weight:bold">=</span> <span style="color:#0086b3">len</span>(f_chaplist)
+</span></span><span style="display:flex;"><span>    	s_chaplist <span style="color:#000;font-weight:bold">=</span> _read_book(s_book_dir)
+</span></span><span style="display:flex;"><span>    	<span style="color:#998;font-style:italic"># 重新命名第二个书籍章节文件名,避免重复</span>
+</span></span><span style="display:flex;"><span>    	<span style="color:#000;font-weight:bold">for</span> chap <span style="color:#000;font-weight:bold">in</span> s_chaplist:
+</span></span><span style="display:flex;"><span>        	chap<span style="color:#000;font-weight:bold">.</span>file_name <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#39;00&#39;</span><span style="color:#000;font-weight:bold">+</span><span style="color:#d14">f</span><span style="color:#d14">&#39;</span><span style="color:#d14">{</span>len_f_c<span style="color:#d14">}</span><span style="color:#d14">.xhtml&#39;</span>
+</span></span><span style="display:flex;"><span>        	len_f_c <span style="color:#000;font-weight:bold">+=</span> <span style="color:#099">1</span>
+</span></span><span style="display:flex;"><span>    	n_chaplist <span style="color:#000;font-weight:bold">=</span> f_chaplist <span style="color:#000;font-weight:bold">+</span> s_chaplist
+</span></span><span style="display:flex;"><span>    	_write_book(n_chaplist, n_book, time)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>接下来，让我们逐步分析</p>
+<p>首先看<code>_new_book</code>​函数</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">def</span> <span style="color:#900;font-weight:bold">_new_book</span>(time):
+</span></span><span style="display:flex;"><span>    	<span style="color:#998;font-style:italic"># 创建EpubBook</span>
+</span></span><span style="display:flex;"><span>    	book <span style="color:#000;font-weight:bold">=</span> epub<span style="color:#000;font-weight:bold">.</span>EpubBook()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    	<span style="color:#998;font-style:italic"># 设置书籍基本信息</span>
+</span></span><span style="display:flex;"><span>    	book<span style="color:#000;font-weight:bold">.</span>set_identifier(<span style="color:#d14">&#39;id&#39;</span> <span style="color:#000;font-weight:bold">+</span> time)
+</span></span><span style="display:flex;"><span>    	book<span style="color:#000;font-weight:bold">.</span>set_title(<span style="color:#d14">&#39;epub_&#39;</span> <span style="color:#000;font-weight:bold">+</span> time)
+</span></span><span style="display:flex;"><span>    	book<span style="color:#000;font-weight:bold">.</span>set_language(<span style="color:#d14">&#39;cn&#39;</span>)
+</span></span><span style="display:flex;"><span>    	book<span style="color:#000;font-weight:bold">.</span>add_author(<span style="color:#d14">&#39;writer&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    	<span style="color:#998;font-style:italic"># 添加样式表</span>
+</span></span><span style="display:flex;"><span>    	style <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#39;body {font-family: Times, Times New Roman, serif;}&#39;</span>
+</span></span><span style="display:flex;"><span>    	nav_css <span style="color:#000;font-weight:bold">=</span> epub<span style="color:#000;font-weight:bold">.</span>EpubItem(
+</span></span><span style="display:flex;"><span>        	uid<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#39;nav_css&#39;</span>, file_name<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#39;style/nav.css&#39;</span>, media_type<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#39;text/css&#39;</span>, content<span style="color:#000;font-weight:bold">=</span>style)
+</span></span><span style="display:flex;"><span>    	book<span style="color:#000;font-weight:bold">.</span>add_item(nav_css)
+</span></span><span style="display:flex;"><span>    	<span style="color:#000;font-weight:bold">return</span> book
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这个很简单，看了上面文章的都知道，主要是生成一个设置好元数据的epub对象</p>
+<p>接下来看<code>_read_book</code>​函数</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">def</span> <span style="color:#900;font-weight:bold">_read_book</span>(book_dir):
+</span></span><span style="display:flex;"><span>    	<span style="color:#998;font-style:italic"># 读取旧EPUB书籍</span>
+</span></span><span style="display:flex;"><span>    	old_book <span style="color:#000;font-weight:bold">=</span> epub<span style="color:#000;font-weight:bold">.</span>read_epub(book_dir)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    	<span style="color:#998;font-style:italic"># 过滤掉书中的nav.html</span>
+</span></span><span style="display:flex;"><span>    	docs <span style="color:#000;font-weight:bold">=</span> [item <span style="color:#000;font-weight:bold">for</span> item <span style="color:#000;font-weight:bold">in</span> old_book<span style="color:#000;font-weight:bold">.</span>get_items_of_type(
+</span></span><span style="display:flex;"><span>        	ebooklib<span style="color:#000;font-weight:bold">.</span>ITEM_DOCUMENT) <span style="color:#000;font-weight:bold">if</span> item<span style="color:#000;font-weight:bold">.</span>file_name <span style="color:#000;font-weight:bold">!=</span> <span style="color:#d14">&#39;nav.xhtml&#39;</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    	<span style="color:#998;font-style:italic"># 将文档转换为EpubHtml添加到列表</span>
+</span></span><span style="display:flex;"><span>    	chaplist <span style="color:#000;font-weight:bold">=</span> []
+</span></span><span style="display:flex;"><span>    	<span style="color:#000;font-weight:bold">for</span> doc <span style="color:#000;font-weight:bold">in</span> docs:
+</span></span><span style="display:flex;"><span>        	<span style="color:#000;font-weight:bold">if</span> doc<span style="color:#000;font-weight:bold">.</span>media_type <span style="color:#000;font-weight:bold">==</span> <span style="color:#d14">&#39;application/xhtml+xml&#39;</span>:
+</span></span><span style="display:flex;"><span>            	<span style="color:#998;font-style:italic"># print(doc.title)</span>
+</span></span><span style="display:flex;"><span>            	contect <span style="color:#000;font-weight:bold">=</span> doc<span style="color:#000;font-weight:bold">.</span>content
+</span></span><span style="display:flex;"><span>            	soup <span style="color:#000;font-weight:bold">=</span> BeautifulSoup(contect, <span style="color:#d14">&#34;html.parser&#34;</span>)
+</span></span><span style="display:flex;"><span>            	title <span style="color:#000;font-weight:bold">=</span> soup<span style="color:#000;font-weight:bold">.</span>find(<span style="color:#d14">&#39;title&#39;</span>)<span style="color:#000;font-weight:bold">.</span>text
+</span></span><span style="display:flex;"><span>            	chap <span style="color:#000;font-weight:bold">=</span> epub<span style="color:#000;font-weight:bold">.</span>EpubHtml(
+</span></span><span style="display:flex;"><span>                	title<span style="color:#000;font-weight:bold">=</span>title, file_name<span style="color:#000;font-weight:bold">=</span>doc<span style="color:#000;font-weight:bold">.</span>file_name, lang<span style="color:#000;font-weight:bold">=</span>doc<span style="color:#000;font-weight:bold">.</span>lang, content<span style="color:#000;font-weight:bold">=</span>contect)
+</span></span><span style="display:flex;"><span>            	chaplist<span style="color:#000;font-weight:bold">.</span>append(chap)
+</span></span><span style="display:flex;"><span>    	<span style="color:#000;font-weight:bold">return</span> chaplist
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>首先，读取已有的epub文件</p>
+<p>​<code>old_book = epub.read_epub(book_dir)</code></p>
+<p>然后，获得epub文件中的xhtml文件，当然，要把 nav.xhtml 去掉</p>
+<p>​<code>​    docs = [item for item in old_book.get_items_of_type(ebooklib.ITEM_DOCUMENT) if item.file_name != 'nav.xhtml']</code>​</p>
+<p>这时要注意，获得的docs列表里面的都是EpubItem类型的数据，所以我们要转换一下</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>    	<span style="color:#998;font-style:italic"># 将文档转换为EpubHtml添加到列表</span>
+</span></span><span style="display:flex;"><span>    	chaplist <span style="color:#000;font-weight:bold">=</span> []
+</span></span><span style="display:flex;"><span>    	<span style="color:#000;font-weight:bold">for</span> doc <span style="color:#000;font-weight:bold">in</span> docs:
+</span></span><span style="display:flex;"><span>        	<span style="color:#000;font-weight:bold">if</span> doc<span style="color:#000;font-weight:bold">.</span>media_type <span style="color:#000;font-weight:bold">==</span> <span style="color:#d14">&#39;application/xhtml+xml&#39;</span>:
+</span></span><span style="display:flex;"><span>            	<span style="color:#998;font-style:italic"># print(doc.title)</span>
+</span></span><span style="display:flex;"><span>            	contect <span style="color:#000;font-weight:bold">=</span> doc<span style="color:#000;font-weight:bold">.</span>content
+</span></span><span style="display:flex;"><span>            	soup <span style="color:#000;font-weight:bold">=</span> BeautifulSoup(contect, <span style="color:#d14">&#34;html.parser&#34;</span>)
+</span></span><span style="display:flex;"><span>            	title <span style="color:#000;font-weight:bold">=</span> soup<span style="color:#000;font-weight:bold">.</span>find(<span style="color:#d14">&#39;title&#39;</span>)<span style="color:#000;font-weight:bold">.</span>text
+</span></span><span style="display:flex;"><span>            	chap <span style="color:#000;font-weight:bold">=</span> epub<span style="color:#000;font-weight:bold">.</span>EpubHtml(
+</span></span><span style="display:flex;"><span>                	title<span style="color:#000;font-weight:bold">=</span>title, file_name<span style="color:#000;font-weight:bold">=</span>doc<span style="color:#000;font-weight:bold">.</span>file_name, lang<span style="color:#000;font-weight:bold">=</span>doc<span style="color:#000;font-weight:bold">.</span>lang, content<span style="color:#000;font-weight:bold">=</span>contect)
+</span></span><span style="display:flex;"><span>            	chaplist<span style="color:#000;font-weight:bold">.</span>append(chap)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>可能有人会问为什么要用bs4库，我等会会详细讲一下</p>
+<p>好了，可以返回一个写好章节的列表了</p>
+<p>​<code>return chaplist</code>​</p>
+<p>至于<code>_write_book</code>​函数，也很简单</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">def</span> <span style="color:#900;font-weight:bold">_write_book</span>(chaplist, book, time):
+</span></span><span style="display:flex;"><span>    	<span style="color:#998;font-style:italic"># 添加所有章节文档</span>
+</span></span><span style="display:flex;"><span>    	<span style="color:#000;font-weight:bold">for</span> chap <span style="color:#000;font-weight:bold">in</span> chaplist:
+</span></span><span style="display:flex;"><span>        	book<span style="color:#000;font-weight:bold">.</span>add_item(chap)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    	<span style="color:#998;font-style:italic"># 设置书籍目录和导航</span>
+</span></span><span style="display:flex;"><span>    	book<span style="color:#000;font-weight:bold">.</span>toc <span style="color:#000;font-weight:bold">=</span> chaplist
+</span></span><span style="display:flex;"><span>    	book<span style="color:#000;font-weight:bold">.</span>spine <span style="color:#000;font-weight:bold">=</span> chaplist
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    	<span style="color:#998;font-style:italic"># 添加NCX和导航文件</span>
+</span></span><span style="display:flex;"><span>    	book<span style="color:#000;font-weight:bold">.</span>add_item(epub<span style="color:#000;font-weight:bold">.</span>EpubNcx())
+</span></span><span style="display:flex;"><span>    	book<span style="color:#000;font-weight:bold">.</span>add_item(epub<span style="color:#000;font-weight:bold">.</span>EpubNav())
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    	<span style="color:#998;font-style:italic"># 生成EPUB文件</span>
+</span></span><span style="display:flex;"><span>    	epub<span style="color:#000;font-weight:bold">.</span>write_epub(<span style="color:#d14">&#39;h_epub_&#39;</span> <span style="color:#000;font-weight:bold">+</span> time <span style="color:#000;font-weight:bold">+</span> <span style="color:#d14">&#39;.epub&#39;</span>, book)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这个没啥好讲的，就是将设置好的章节列表转换为目录再写进去</p>
+<p>最后，就是合并的主函数<code>_merge_epub</code>​函数了</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">def</span> <span style="color:#900;font-weight:bold">_merge_epub</span>(f_book_dir, s_book_dir, time):
+</span></span><span style="display:flex;"><span>    	n_book <span style="color:#000;font-weight:bold">=</span> _new_book(time)  <span style="color:#998;font-style:italic"># 新建epub文件</span>
+</span></span><span style="display:flex;"><span>    	f_chaplist <span style="color:#000;font-weight:bold">=</span> _read_book(f_book_dir)
+</span></span><span style="display:flex;"><span>    	len_f_c <span style="color:#000;font-weight:bold">=</span> <span style="color:#0086b3">len</span>(f_chaplist)
+</span></span><span style="display:flex;"><span>    	s_chaplist <span style="color:#000;font-weight:bold">=</span> _read_book(s_book_dir)
+</span></span><span style="display:flex;"><span>    	<span style="color:#998;font-style:italic"># 重新命名第二个书籍章节文件名,避免重复</span>
+</span></span><span style="display:flex;"><span>    	<span style="color:#000;font-weight:bold">for</span> chap <span style="color:#000;font-weight:bold">in</span> s_chaplist:
+</span></span><span style="display:flex;"><span>        	chap<span style="color:#000;font-weight:bold">.</span>file_name <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#39;00&#39;</span><span style="color:#000;font-weight:bold">+</span><span style="color:#d14">f</span><span style="color:#d14">&#39;</span><span style="color:#d14">{</span>len_f_c<span style="color:#d14">}</span><span style="color:#d14">.xhtml&#39;</span>
+</span></span><span style="display:flex;"><span>        	len_f_c <span style="color:#000;font-weight:bold">+=</span> <span style="color:#099">1</span>
+</span></span><span style="display:flex;"><span>    	n_chaplist <span style="color:#000;font-weight:bold">=</span> f_chaplist <span style="color:#000;font-weight:bold">+</span> s_chaplist
+</span></span><span style="display:flex;"><span>    	_write_book(n_chaplist, n_book, time)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>首先，利用上面的<code>_new_book</code>​函数，新建一个epub数据</p>
+<p>​<code>n_book = _new_book(time)</code>​</p>
+<p>然后，读取第一个epub文件的章节列表</p>
+<p>​<code>f_chaplist = _read_book(f_book_dir)</code>​</p>
+<p>为了后面的去重工作，得先输出列表长度</p>
+<p>​<code>len_f_c = len(f_chaplist)</code></p>
+<p>接下来，读取第二个epub文件的章节列表</p>
+<p>​<code>s_chaplist = _read_book(s_book_dir)</code>​</p>
+<p>由于两个文件的xhtml文件名会有重复，得重命名一下</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>    	<span style="color:#998;font-style:italic"># 重新命名第二个书籍章节文件名,避免重复</span>
+</span></span><span style="display:flex;"><span>    	<span style="color:#000;font-weight:bold">for</span> chap <span style="color:#000;font-weight:bold">in</span> s_chaplist:
+</span></span><span style="display:flex;"><span>        	chap<span style="color:#000;font-weight:bold">.</span>file_name <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#39;00&#39;</span><span style="color:#000;font-weight:bold">+</span><span style="color:#d14">f</span><span style="color:#d14">&#39;</span><span style="color:#d14">{</span>len_f_c<span style="color:#d14">}</span><span style="color:#d14">.xhtml&#39;</span>
+</span></span><span style="display:flex;"><span>        	len_f_c <span style="color:#000;font-weight:bold">+=</span> <span style="color:#099">1</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>好了，合并一下重命名后的列表</p>
+<p>​<code>n_chaplist = f_chaplist + s_chaplist</code>​</p>
+<p>最后，写入新文件</p>
+<p>​<code>_write_book(n_chaplist, n_book, time)</code>​</p>
+<p>这样，合并文件就写好了</p>
+<p>最后，让我们看看如何追加epub文件</p>
+<h2 id="追加epub文件">追加epub文件</h2>
+<p>由于文件数量过多，我总不可能将所有txt文件长期保存(虽然还是这么做了)，所以还是得写出追加文件啊。</p>
+<p>这是源代码</p>
+<p>​<code>epub_api.py</code></p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">36
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">37
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">38
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">39
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">40
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">41
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">42
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">43
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">from</span> <span style="color:#555">ebooklib</span> <span style="color:#000;font-weight:bold">import</span> epub
+</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">import</span> <span style="color:#555">file</span> <span style="color:#000;font-weight:bold">as</span> <span style="color:#555">f</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">def</span> <span style="color:#900;font-weight:bold">_set_meta</span>(book, time):  <span style="color:#998;font-style:italic"># 设置元数据</span>
+</span></span><span style="display:flex;"><span>	    book<span style="color:#000;font-weight:bold">.</span>set_identifier(<span style="color:#d14">&#34;id&#34;</span><span style="color:#000;font-weight:bold">+</span>time)
+</span></span><span style="display:flex;"><span>	    book<span style="color:#000;font-weight:bold">.</span>set_title(<span style="color:#d14">&#34;h_epub_&#34;</span><span style="color:#000;font-weight:bold">+</span>time)
+</span></span><span style="display:flex;"><span>	    book<span style="color:#000;font-weight:bold">.</span>set_language(<span style="color:#d14">&#34;cn&#34;</span>)
+</span></span><span style="display:flex;"><span>	    book<span style="color:#000;font-weight:bold">.</span>add_author(<span style="color:#d14">&#34;zyx&#34;</span>)
+</span></span><span style="display:flex;"><span>	    book<span style="color:#000;font-weight:bold">.</span>add_metadata(<span style="color:#d14">&#34;DC&#34;</span>, <span style="color:#d14">&#34;description&#34;</span>, <span style="color:#d14">&#34;h&#34;</span>)
+</span></span><span style="display:flex;"><span>	    style <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#39;body { font-family: Times, Times New Roman, serif; }&#39;</span>
+</span></span><span style="display:flex;"><span>	    nav_css <span style="color:#000;font-weight:bold">=</span> epub<span style="color:#000;font-weight:bold">.</span>EpubItem(uid<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;style_nav&#34;</span>,
+</span></span><span style="display:flex;"><span>	                            file_name<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;style/nav.css&#34;</span>,
+</span></span><span style="display:flex;"><span>	                            media_type<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;text/css&#34;</span>,
+</span></span><span style="display:flex;"><span>	                            content<span style="color:#000;font-weight:bold">=</span>style)
+</span></span><span style="display:flex;"><span>	    book<span style="color:#000;font-weight:bold">.</span>add_item(nav_css)
+</span></span><span style="display:flex;"><span>	    <span style="color:#998;font-style:italic"># 添加默认的 NCX and Nav file</span>
+</span></span><span style="display:flex;"><span>	    book<span style="color:#000;font-weight:bold">.</span>add_item(epub<span style="color:#000;font-weight:bold">.</span>EpubNcx())
+</span></span><span style="display:flex;"><span>	    book<span style="color:#000;font-weight:bold">.</span>add_item(epub<span style="color:#000;font-weight:bold">.</span>EpubNav())
+</span></span><span style="display:flex;"><span>	    <span style="color:#000;font-weight:bold">return</span> book
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">def</span> <span style="color:#900;font-weight:bold">_book_chaplist</span>(book, time, chaplist):  <span style="color:#998;font-style:italic"># 写入目录文件</span>
+</span></span><span style="display:flex;"><span>	    <span style="color:#000;font-weight:bold">for</span> chap <span style="color:#000;font-weight:bold">in</span> chaplist:
+</span></span><span style="display:flex;"><span>	        book<span style="color:#000;font-weight:bold">.</span>add_item(chap)
+</span></span><span style="display:flex;"><span>	    book<span style="color:#000;font-weight:bold">.</span>toc <span style="color:#000;font-weight:bold">=</span> chaplist
+</span></span><span style="display:flex;"><span>	    book<span style="color:#000;font-weight:bold">.</span>spine <span style="color:#000;font-weight:bold">=</span> chaplist
+</span></span><span style="display:flex;"><span>	    epub<span style="color:#000;font-weight:bold">.</span>write_epub(<span style="color:#d14">&#39;./&#39;</span><span style="color:#000;font-weight:bold">+</span><span style="color:#d14">&#39;h_epub_&#39;</span><span style="color:#000;font-weight:bold">+</span>time<span style="color:#000;font-weight:bold">+</span><span style="color:#d14">&#39;.epub&#39;</span>, book)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">def</span> <span style="color:#900;font-weight:bold">_change_chap_list</span>(old_list, <span style="color:#0086b3">dir</span>):  <span style="color:#998;font-style:italic"># 合并新旧列表</span>
+</span></span><span style="display:flex;"><span>	    <span style="color:#0086b3">dir</span>, txt_file_line <span style="color:#000;font-weight:bold">=</span> f<span style="color:#000;font-weight:bold">.</span>_t_files(<span style="color:#0086b3">dir</span>)  <span style="color:#998;font-style:italic"># 读取TXT文件夹</span>
+</span></span><span style="display:flex;"><span>	    old_len <span style="color:#000;font-weight:bold">=</span> <span style="color:#0086b3">len</span>(old_list)  <span style="color:#998;font-style:italic"># 标记旧列表长度</span>
+</span></span><span style="display:flex;"><span>	    new_chaplist <span style="color:#000;font-weight:bold">=</span> old_list
+</span></span><span style="display:flex;"><span>	    <span style="color:#000;font-weight:bold">for</span> i <span style="color:#000;font-weight:bold">in</span> <span style="color:#0086b3">range</span>(<span style="color:#0086b3">len</span>(txt_file_line)):  <span style="color:#998;font-style:italic"># 开始合并</span>
+</span></span><span style="display:flex;"><span>	        title, html <span style="color:#000;font-weight:bold">=</span> f<span style="color:#000;font-weight:bold">.</span>_txt2html(txt_file_line[i])
+</span></span><span style="display:flex;"><span>	        chap <span style="color:#000;font-weight:bold">=</span> epub<span style="color:#000;font-weight:bold">.</span>EpubHtml(title<span style="color:#000;font-weight:bold">=</span>title,
+</span></span><span style="display:flex;"><span>	                             file_name<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#39;00</span><span style="color:#d14">{}</span><span style="color:#d14">.xhtml&#39;</span><span style="color:#000;font-weight:bold">.</span>format(i<span style="color:#000;font-weight:bold">+</span>old_len),
+</span></span><span style="display:flex;"><span>	                             lang<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#39;cn&#39;</span>,
+</span></span><span style="display:flex;"><span>	                             content<span style="color:#000;font-weight:bold">=</span>html)
+</span></span><span style="display:flex;"><span>	        new_chaplist<span style="color:#000;font-weight:bold">.</span>append(chap)
+</span></span><span style="display:flex;"><span>	        <span style="color:#000;font-weight:bold">pass</span>
+</span></span><span style="display:flex;"><span>	    <span style="color:#000;font-weight:bold">return</span> new_chaplist
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>​<code>epub_add.py</code></p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">import</span> <span style="color:#555">ebooklib</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">from</span> <span style="color:#555">ebooklib</span> <span style="color:#000;font-weight:bold">import</span> epub
+</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">import</span> <span style="color:#555">epub_api</span> <span style="color:#000;font-weight:bold">as</span> <span style="color:#555">api</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">from</span> <span style="color:#555">bs4</span> <span style="color:#000;font-weight:bold">import</span> BeautifulSoup
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">def</span> <span style="color:#900;font-weight:bold">_old_chaplist_read</span>(book_dir):  <span style="color:#998;font-style:italic"># 读取旧epub文件</span>
+</span></span><span style="display:flex;"><span>	    <span style="color:#998;font-style:italic"># 读取旧EPUB书籍</span>
+</span></span><span style="display:flex;"><span>	    old_book <span style="color:#000;font-weight:bold">=</span> epub<span style="color:#000;font-weight:bold">.</span>read_epub(book_dir)
+</span></span><span style="display:flex;"><span>	
+</span></span><span style="display:flex;"><span>	    <span style="color:#998;font-style:italic"># 过滤掉旧书中的nav.html</span>
+</span></span><span style="display:flex;"><span>	    docs <span style="color:#000;font-weight:bold">=</span> [item <span style="color:#000;font-weight:bold">for</span> item <span style="color:#000;font-weight:bold">in</span> old_book<span style="color:#000;font-weight:bold">.</span>get_items_of_type(
+</span></span><span style="display:flex;"><span>	        ebooklib<span style="color:#000;font-weight:bold">.</span>ITEM_DOCUMENT) <span style="color:#000;font-weight:bold">if</span> item<span style="color:#000;font-weight:bold">.</span>file_name <span style="color:#000;font-weight:bold">!=</span> <span style="color:#d14">&#39;nav.xhtml&#39;</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	    <span style="color:#998;font-style:italic"># 将文档转换为EpubHtml添加到列表</span>
+</span></span><span style="display:flex;"><span>	    chaplist <span style="color:#000;font-weight:bold">=</span> []
+</span></span><span style="display:flex;"><span>	    <span style="color:#000;font-weight:bold">for</span> doc <span style="color:#000;font-weight:bold">in</span> docs:
+</span></span><span style="display:flex;"><span>	        <span style="color:#000;font-weight:bold">if</span> doc<span style="color:#000;font-weight:bold">.</span>media_type <span style="color:#000;font-weight:bold">==</span> <span style="color:#d14">&#39;application/xhtml+xml&#39;</span>:
+</span></span><span style="display:flex;"><span>	            <span style="color:#998;font-style:italic"># print(doc.title)</span>
+</span></span><span style="display:flex;"><span>	            contect <span style="color:#000;font-weight:bold">=</span> doc<span style="color:#000;font-weight:bold">.</span>content
+</span></span><span style="display:flex;"><span>	            soup <span style="color:#000;font-weight:bold">=</span> BeautifulSoup(contect, <span style="color:#d14">&#34;html.parser&#34;</span>)
+</span></span><span style="display:flex;"><span>	            title <span style="color:#000;font-weight:bold">=</span> soup<span style="color:#000;font-weight:bold">.</span>find(<span style="color:#d14">&#39;title&#39;</span>)<span style="color:#000;font-weight:bold">.</span>text
+</span></span><span style="display:flex;"><span>	            chap <span style="color:#000;font-weight:bold">=</span> epub<span style="color:#000;font-weight:bold">.</span>EpubHtml(
+</span></span><span style="display:flex;"><span>	                title<span style="color:#000;font-weight:bold">=</span>title, file_name<span style="color:#000;font-weight:bold">=</span>doc<span style="color:#000;font-weight:bold">.</span>file_name, lang<span style="color:#000;font-weight:bold">=</span>doc<span style="color:#000;font-weight:bold">.</span>lang, content<span style="color:#000;font-weight:bold">=</span>contect)
+</span></span><span style="display:flex;"><span>	            chaplist<span style="color:#000;font-weight:bold">.</span>append(chap)
+</span></span><span style="display:flex;"><span>	    <span style="color:#000;font-weight:bold">return</span> chaplist
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">def</span> <span style="color:#900;font-weight:bold">_new_book_write</span>(old_book_dir, <span style="color:#0086b3">dir</span>, time):  <span style="color:#998;font-style:italic"># 生成新epub文件</span>
+</span></span><span style="display:flex;"><span>	    old_chaplist <span style="color:#000;font-weight:bold">=</span> _old_chaplist_read(old_book_dir)
+</span></span><span style="display:flex;"><span>	    new_book <span style="color:#000;font-weight:bold">=</span> epub<span style="color:#000;font-weight:bold">.</span>EpubBook()
+</span></span><span style="display:flex;"><span>	    new_chaplist <span style="color:#000;font-weight:bold">=</span> api<span style="color:#000;font-weight:bold">.</span>_change_chap_list(old_chaplist, <span style="color:#0086b3">dir</span>)
+</span></span><span style="display:flex;"><span>    	api<span style="color:#000;font-weight:bold">.</span>_set_meta(new_book, time)
+</span></span><span style="display:flex;"><span>	    api<span style="color:#000;font-weight:bold">.</span>_book_chaplist(new_book, time, new_chaplist)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>​<code>epub.api.py</code>​没啥好讲的，就是上面的代码打包了一下。看得懂上面两章的就可以看懂这个了</p>
+<p>重点是<code>epub_add.py</code>​</p>
+<p>首先，看一下<code>_old_chaplist_read</code>​函数</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">def</span> <span style="color:#900;font-weight:bold">_old_chaplist_read</span>(book_dir):  <span style="color:#998;font-style:italic"># 读取旧epub文件</span>
+</span></span><span style="display:flex;"><span>    	<span style="color:#998;font-style:italic"># 读取旧EPUB书籍</span>
+</span></span><span style="display:flex;"><span>    	old_book <span style="color:#000;font-weight:bold">=</span> epub<span style="color:#000;font-weight:bold">.</span>read_epub(book_dir)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    	<span style="color:#998;font-style:italic"># 过滤掉旧书中的nav.html</span>
+</span></span><span style="display:flex;"><span>    	docs <span style="color:#000;font-weight:bold">=</span> [item <span style="color:#000;font-weight:bold">for</span> item <span style="color:#000;font-weight:bold">in</span> old_book<span style="color:#000;font-weight:bold">.</span>get_items_of_type(
+</span></span><span style="display:flex;"><span>    	    ebooklib<span style="color:#000;font-weight:bold">.</span>ITEM_DOCUMENT) <span style="color:#000;font-weight:bold">if</span> item<span style="color:#000;font-weight:bold">.</span>file_name <span style="color:#000;font-weight:bold">!=</span> <span style="color:#d14">&#39;nav.xhtml&#39;</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    	<span style="color:#998;font-style:italic"># 将文档转换为EpubHtml添加到列表</span>
+</span></span><span style="display:flex;"><span>    	chaplist <span style="color:#000;font-weight:bold">=</span> []
+</span></span><span style="display:flex;"><span>    	<span style="color:#000;font-weight:bold">for</span> doc <span style="color:#000;font-weight:bold">in</span> docs:
+</span></span><span style="display:flex;"><span>    	    <span style="color:#000;font-weight:bold">if</span> doc<span style="color:#000;font-weight:bold">.</span>media_type <span style="color:#000;font-weight:bold">==</span> <span style="color:#d14">&#39;application/xhtml+xml&#39;</span>:
+</span></span><span style="display:flex;"><span>    	        <span style="color:#998;font-style:italic"># print(doc.title)</span>
+</span></span><span style="display:flex;"><span>    	        contect <span style="color:#000;font-weight:bold">=</span> doc<span style="color:#000;font-weight:bold">.</span>content
+</span></span><span style="display:flex;"><span>    	        soup <span style="color:#000;font-weight:bold">=</span> BeautifulSoup(contect, <span style="color:#d14">&#34;html.parser&#34;</span>)
+</span></span><span style="display:flex;"><span>    	        title <span style="color:#000;font-weight:bold">=</span> soup<span style="color:#000;font-weight:bold">.</span>find(<span style="color:#d14">&#39;title&#39;</span>)<span style="color:#000;font-weight:bold">.</span>text
+</span></span><span style="display:flex;"><span>    	        chap <span style="color:#000;font-weight:bold">=</span> epub<span style="color:#000;font-weight:bold">.</span>EpubHtml(
+</span></span><span style="display:flex;"><span>    	            title<span style="color:#000;font-weight:bold">=</span>title, file_name<span style="color:#000;font-weight:bold">=</span>doc<span style="color:#000;font-weight:bold">.</span>file_name, lang<span style="color:#000;font-weight:bold">=</span>doc<span style="color:#000;font-weight:bold">.</span>lang, content<span style="color:#000;font-weight:bold">=</span>contect)
+</span></span><span style="display:flex;"><span>    	        chaplist<span style="color:#000;font-weight:bold">.</span>append(chap)
+</span></span><span style="display:flex;"><span>    	<span style="color:#000;font-weight:bold">return</span> chaplist
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>    	<span style="color:#998;font-style:italic"># 读取旧EPUB书籍</span>
+</span></span><span style="display:flex;"><span>    	old_book <span style="color:#000;font-weight:bold">=</span> epub<span style="color:#000;font-weight:bold">.</span>read_epub(book_dir)
+</span></span><span style="display:flex;"><span>	
+</span></span><span style="display:flex;"><span>    	<span style="color:#998;font-style:italic"># 过滤掉旧书中的nav.html</span>
+</span></span><span style="display:flex;"><span>    	docs <span style="color:#000;font-weight:bold">=</span> [item <span style="color:#000;font-weight:bold">for</span> item <span style="color:#000;font-weight:bold">in</span> old_book<span style="color:#000;font-weight:bold">.</span>get_items_of_type(
+</span></span><span style="display:flex;"><span>    	    ebooklib<span style="color:#000;font-weight:bold">.</span>ITEM_DOCUMENT) <span style="color:#000;font-weight:bold">if</span> item<span style="color:#000;font-weight:bold">.</span>file_name <span style="color:#000;font-weight:bold">!=</span> <span style="color:#d14">&#39;nav.xhtml&#39;</span>]
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这两段看上去很熟悉，看了合并讲解的都知道了，我就不再说一遍了</p>
+<p>然后让我们看这一段</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>    	<span style="color:#998;font-style:italic"># 将文档转换为EpubHtml添加到列表</span>
+</span></span><span style="display:flex;"><span>    	chaplist <span style="color:#000;font-weight:bold">=</span> []
+</span></span><span style="display:flex;"><span>    	<span style="color:#000;font-weight:bold">for</span> doc <span style="color:#000;font-weight:bold">in</span> docs:
+</span></span><span style="display:flex;"><span>    	    <span style="color:#000;font-weight:bold">if</span> doc<span style="color:#000;font-weight:bold">.</span>media_type <span style="color:#000;font-weight:bold">==</span> <span style="color:#d14">&#39;application/xhtml+xml&#39;</span>:
+</span></span><span style="display:flex;"><span>    	        <span style="color:#998;font-style:italic"># print(doc.title)</span>
+</span></span><span style="display:flex;"><span>    	        contect <span style="color:#000;font-weight:bold">=</span> doc<span style="color:#000;font-weight:bold">.</span>content
+</span></span><span style="display:flex;"><span>    	        soup <span style="color:#000;font-weight:bold">=</span> BeautifulSoup(contect, <span style="color:#d14">&#34;html.parser&#34;</span>)
+</span></span><span style="display:flex;"><span>    	        title <span style="color:#000;font-weight:bold">=</span> soup<span style="color:#000;font-weight:bold">.</span>find(<span style="color:#d14">&#39;title&#39;</span>)<span style="color:#000;font-weight:bold">.</span>text
+</span></span><span style="display:flex;"><span>    	        chap <span style="color:#000;font-weight:bold">=</span> epub<span style="color:#000;font-weight:bold">.</span>EpubHtml(
+</span></span><span style="display:flex;"><span>    	            title<span style="color:#000;font-weight:bold">=</span>title, file_name<span style="color:#000;font-weight:bold">=</span>doc<span style="color:#000;font-weight:bold">.</span>file_name, lang<span style="color:#000;font-weight:bold">=</span>doc<span style="color:#000;font-weight:bold">.</span>lang, content<span style="color:#000;font-weight:bold">=</span>contect)
+</span></span><span style="display:flex;"><span>    	        chaplist<span style="color:#000;font-weight:bold">.</span>append(chap)
+</span></span><span style="display:flex;"><span>    	<span style="color:#000;font-weight:bold">return</span> chaplist
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这一段看上去也没啥问题，但如果你这么想就错了</p>
+<p>让我们看看这几句</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>	            contect <span style="color:#000;font-weight:bold">=</span> doc<span style="color:#000;font-weight:bold">.</span>content
+</span></span><span style="display:flex;"><span>	            soup <span style="color:#000;font-weight:bold">=</span> BeautifulSoup(contect, <span style="color:#d14">&#34;html.parser&#34;</span>)
+</span></span><span style="display:flex;"><span>    	        title <span style="color:#000;font-weight:bold">=</span> soup<span style="color:#000;font-weight:bold">.</span>find(<span style="color:#d14">&#39;title&#39;</span>)<span style="color:#000;font-weight:bold">.</span>text
+</span></span><span style="display:flex;"><span>    	        chap <span style="color:#000;font-weight:bold">=</span> epub<span style="color:#000;font-weight:bold">.</span>EpubHtml(
+</span></span><span style="display:flex;"><span>    	            title<span style="color:#000;font-weight:bold">=</span>title, file_name<span style="color:#000;font-weight:bold">=</span>doc<span style="color:#000;font-weight:bold">.</span>file_name, lang<span style="color:#000;font-weight:bold">=</span>doc<span style="color:#000;font-weight:bold">.</span>lang, content<span style="color:#000;font-weight:bold">=</span>contect)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>为何要用bs4库呢？</p>
+<p>其实在<code>ebooklib</code>​库中有直接转换的函数，但我们不能直接用</p>
+<p>因为<code>EpubItem</code>​是没有标题参数的！</p>
+<p>所以我们必须在内容中提取出来标题，才能够进行处理</p>
+<p>即</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>    	        contect <span style="color:#000;font-weight:bold">=</span> doc<span style="color:#000;font-weight:bold">.</span>content
+</span></span><span style="display:flex;"><span>    	        soup <span style="color:#000;font-weight:bold">=</span> BeautifulSoup(contect, <span style="color:#d14">&#34;html.parser&#34;</span>)
+</span></span><span style="display:flex;"><span>	            title <span style="color:#000;font-weight:bold">=</span> soup<span style="color:#000;font-weight:bold">.</span>find(<span style="color:#d14">&#39;title&#39;</span>)<span style="color:#000;font-weight:bold">.</span>text
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后才能</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>    	        chap <span style="color:#000;font-weight:bold">=</span> epub<span style="color:#000;font-weight:bold">.</span>EpubHtml(
+</span></span><span style="display:flex;"><span>    	            title<span style="color:#000;font-weight:bold">=</span>title, file_name<span style="color:#000;font-weight:bold">=</span>doc<span style="color:#000;font-weight:bold">.</span>file_name, lang<span style="color:#000;font-weight:bold">=</span>doc<span style="color:#000;font-weight:bold">.</span>lang, content<span style="color:#000;font-weight:bold">=</span>contect)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>最后让我们把<code>_new_book_write</code>​函数看一下</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">def</span> <span style="color:#900;font-weight:bold">_new_book_write</span>(old_book_dir, <span style="color:#0086b3">dir</span>, time):  <span style="color:#998;font-style:italic"># 生成新epub文件</span>
+</span></span><span style="display:flex;"><span>    	old_chaplist <span style="color:#000;font-weight:bold">=</span> _old_chaplist_read(old_book_dir)  <span style="color:#998;font-style:italic"># 读取旧epub文件</span>
+</span></span><span style="display:flex;"><span>    	new_book <span style="color:#000;font-weight:bold">=</span> epub<span style="color:#000;font-weight:bold">.</span>EpubBook()  <span style="color:#998;font-style:italic"># 新建epub对象</span>
+</span></span><span style="display:flex;"><span>    	new_chaplist <span style="color:#000;font-weight:bold">=</span> api<span style="color:#000;font-weight:bold">.</span>_change_chap_list(old_chaplist, <span style="color:#0086b3">dir</span>)  <span style="color:#998;font-style:italic"># 合并新旧章节</span>
+</span></span><span style="display:flex;"><span>    	api<span style="color:#000;font-weight:bold">.</span>_set_meta(new_book, time)  <span style="color:#998;font-style:italic"># 设置元数据</span>
+</span></span><span style="display:flex;"><span>    	api<span style="color:#000;font-weight:bold">.</span>_book_chaplist(new_book, time, new_chaplist) <span style="color:#998;font-style:italic">#写入对象并保存文件</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>我已经写好了注释，内容看上面说的就好了</p>
+<h1 id="总结">总结</h1>
+<p>本文主要讲了如何使用<code>ebooklib</code>​库进行epub文件的生成，合并与追加</p>
+<p>主要重点有以下几个</p>
+<ol>
+<li>设置目录</li>
+<li>避免xhtml文件名重复</li>
+<li>将<code>EpubItem</code>​转换为<code>EpubHtml</code>​时需重新设置标题</li>
+</ol>
+<p>好了，希望你看完本篇文章后有所收获。中文互联网上讲<code>ebooklib</code>​库的文章很少，希望能帮助到你</p>
+<p>祝你代码不报错，运行一遍过</p>
+
+        </div>
+
+        
+<div class="post-archive">
+    <ul class="post-copyright">
+        <li><strong>Author: </strong><a rel="author" href="https://zyx-31415.github.io">弈宇者</a></li>
+        <li style="word-break:break-all"><strong>Link: </strong><a href="https://zyx-31415.github.io/post/%E5%85%B3%E4%BA%8E%E4%BD%BF%E7%94%A8ebooklib%E8%BF%9B%E8%A1%8C%E5%A4%9A%E4%B8%AAtxt%E8%BD%ACepub%E5%8F%8Aepub%E5%90%88%E5%B9%B6%E4%B8%8E%E8%BF%BD%E5%8A%A0%E6%97%B6%E9%81%87%E5%88%B0%E7%9A%84%E5%B0%8F%E9%97%AE%E9%A2%98/">https://zyx-31415.github.io/post/%E5%85%B3%E4%BA%8E%E4%BD%BF%E7%94%A8ebooklib%E8%BF%9B%E8%A1%8C%E5%A4%9A%E4%B8%AAtxt%E8%BD%ACepub%E5%8F%8Aepub%E5%90%88%E5%B9%B6%E4%B8%8E%E8%BF%BD%E5%8A%A0%E6%97%B6%E9%81%87%E5%88%B0%E7%9A%84%E5%B0%8F%E9%97%AE%E9%A2%98/</a></li>
+        <li><strong>License: </strong>This work is under a <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/">知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议</a>. Kindly fulfill the requirements of the aforementioned License when adapting or creating a derivative of this work.</li>
+    </ul>
+</div>
+<br/>
+
+
+
+        
+
+<div class="post-archive">
+    <h2>See Also</h2>
+    <ul class="listing">
+        
+        <li><a href="/post/vscode%E5%8F%8Aconda%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE/">Vscode及conda超小白环境配置教程</a></li>
+        
+        <li><a href="/post/Hello_world/">Hello_world</a></li>
+        
+        <li><a href="/about/">关于我</a></li>
+        
+        <li><a href="/archives/">归档</a></li>
+        
+        <li><a href="/search/">搜索</a></li>
+        
+    </ul>
+</div>
+
+
+        <div class="post-meta meta-tags">
+            
+            <ul class="clearfix">
+                
+                <li><a href='/tags/ebooklib' target="_blank">ebooklib</a></li>
+                
+                <li><a href='/tags/python' target="_blank">python</a></li>
+                
+                <li><a href='/tags/epub' target="_blank">epub</a></li>
+                
+                <li><a href='/tags/txt%E8%BD%ACepub' target="_blank">txt转epub</a></li>
+                
+            </ul>
+            
+        </div>
+    </article>
+    
+    
+
+    
+    
+    
+    
+
+</div>
+
+                    <footer id="footer">
+    <div>
+        &copy; 2023 <a href="https://zyx-31415.github.io">弈宇 By 弈宇者</a>
+        
+    </div>
+    <br />
+    <div>
+        <div class="github-badge">
+            <a href="https://gohugo.io/" target="_black" rel="nofollow"><span class="badge-subject">Powered by</span><span class="badge-value bg-blue">Hugo</span></a>
+        </div>
+        <div class="github-badge">
+            <a href="https://www.flysnow.org/" target="_black"><span class="badge-subject">Design by</span><span class="badge-value bg-brightgreen">飞雪无情</span></a>
+        </div>
+        <div class="github-badge">
+            <a href="https://github.com/flysnow-org/maupassant-hugo" target="_black"><span class="badge-subject">Theme</span><span class="badge-value bg-yellowgreen">Maupassant</span></a>
+        </div>
+    </div>
+</footer>
+
+
+    
+    
+    <script type="text/javascript">
+        window.MathJax = {
+            tex2jax: {
+                inlineMath: [['$', '$']],
+                processEscapes: true
+                }
+            };
+    </script>
+    <script src='//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+
+<a id="rocket" href="#top"></a>
+<script type="text/javascript" src='/js/totop.js?v=0.0.0' async=""></script>
+<style type="text/css">
+div.highlight {
+    position: relative;
+    margin: 1em 0px;
+}
+
+.copy-code {
+    display: none;
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    color: rgba(255, 255, 255, 0.8);
+    background: rgba(78, 78, 78, 0.8);
+    border-radius: var(--radius);
+    padding: 0 5px;
+    font: inherit;
+    user-select: none;
+    cursor: pointer;
+    border: 0;
+    --radius: 8px;
+}
+
+div.highlight:hover .copy-code,pre:hover .copy-code {
+    display: block;
+}
+
+</style>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+
+
+    <script type="text/javascript" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async></script>
+
+
+
+
+    <script src='/js/douban.js'></script>
+
+                </div>
+
+                <div id="secondary">
+    <section class="widget">
+        <form id="search" action='https://zyx-31415.github.io/search' method="get" accept-charset="utf-8" target="_blank" _lpchecked="1">
+      
+      <input type="text" name="q" maxlength="20" placeholder="Search">
+      <input type="hidden" name="sitesearch" value="https://zyx-31415.github.io">
+      <button type="submit" class="submit icon-search"></button>
+</form>
+    </section>
+
+    <section class="widget">
+        <h3 class="widget-title">Latest articles</h3>
+<ul class="widget-list">
+    
+    <li>
+        <a href="https://zyx-31415.github.io/post/%E5%85%B3%E4%BA%8E%E4%BD%BF%E7%94%A8ebooklib%E8%BF%9B%E8%A1%8C%E5%A4%9A%E4%B8%AAtxt%E8%BD%ACepub%E5%8F%8Aepub%E5%90%88%E5%B9%B6%E4%B8%8E%E8%BF%BD%E5%8A%A0%E6%97%B6%E9%81%87%E5%88%B0%E7%9A%84%E5%B0%8F%E9%97%AE%E9%A2%98/" title="关于使用ebooklib进行多个txt转epub及epub合并与追加时遇到的小问题" target="_blank">关于使用ebooklib进行多个txt转epub及epub合并与追加时遇到的小问题</a>
+    </li>
+    
+    <li>
+        <a href="https://zyx-31415.github.io/post/vscode%E5%8F%8Aconda%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE/" title="Vscode及conda超小白环境配置教程" target="_blank">Vscode及conda超小白环境配置教程</a>
+    </li>
+    
+    <li>
+        <a href="https://zyx-31415.github.io/post/Hello_world/" title="Hello_world" target="_blank">Hello_world</a>
+    </li>
+    
+</ul>
+    </section>
+
+    
+
+    <section class="widget">
+        <h3 class="widget-title"><a href='/categories/'>Categories</a></h3>
+<ul class="widget-list">
+    
+    <li><a href="https://zyx-31415.github.io/categories/code/">code (2)</a></li>
+    
+</ul>
+    </section>
+
+    <section class="widget">
+        <h3 class="widget-title"><a href='/tags/'>Tags</a></h3>
+<div class="tagcloud">
+    
+    <a href="https://zyx-31415.github.io/tags/conda/">conda</a>
+    
+    <a href="https://zyx-31415.github.io/tags/ebooklib/">ebooklib</a>
+    
+    <a href="https://zyx-31415.github.io/tags/epub/">epub</a>
+    
+    <a href="https://zyx-31415.github.io/tags/python/">python</a>
+    
+    <a href="https://zyx-31415.github.io/tags/txt%E8%BD%ACepub/">txt转epub</a>
+    
+    <a href="https://zyx-31415.github.io/tags/vscode/">vscode</a>
+    
+    <a href="https://zyx-31415.github.io/tags/%E5%B0%8F%E7%99%BD/">小白</a>
+    
+    <a href="https://zyx-31415.github.io/tags/%E7%8E%AF%E5%A2%83%E5%AE%89%E8%A3%85/">环境安装</a>
+    
+</div>
+    </section>
+
+    
+<section class="widget">
+    <h3 class="widget-title">Links</h3>
+    <ul class="widget-list">
+        
+        <li>
+            <a target="_blank" href="" title=""></a>
+        </li>
+        
+    </ul>
+</section>
+
+
+    <section class="widget">
+        <h3 class="widget-title">Meta</h3>
+        <ul class="widget-list">
+            <li><a href="https://zyx-31415.github.io/index.xml">RSS</a></li>
+        </ul>
+    </section>
+</div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
