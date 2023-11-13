@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>img2pdf on 弈宇</title>
+    <link>https://zyx-31415.github.io/tags/img2pdf/</link>
+    <description>Recent content in img2pdf on 弈宇</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-CN</language>
+    <lastBuildDate>Mon, 13 Nov 2023 21:19:08 +0800</lastBuildDate><atom:link href="https://zyx-31415.github.io/tags/img2pdf/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>略谈python中如何将图片转为pdf</title>
+      <link>https://zyx-31415.github.io/post/%E7%95%A5%E8%B0%88python%E4%B8%AD%E5%A6%82%E4%BD%95%E5%B0%86%E5%9B%BE%E7%89%87%E8%BD%AC%E4%B8%BApdf/</link>
+      <pubDate>Mon, 13 Nov 2023 21:19:08 +0800</pubDate>
+      
+      <guid>https://zyx-31415.github.io/post/%E7%95%A5%E8%B0%88python%E4%B8%AD%E5%A6%82%E4%BD%95%E5%B0%86%E5%9B%BE%E7%89%87%E8%BD%AC%E4%B8%BApdf/</guid>
+      <description>略谈python中如何将图片转为pdf 1.前言 有的时候，我们有多个目录且存在大量的图片，如图 如果我们想要将每个目录合并为一个文件，一般人们会将其压缩为压缩包，但是这样子操作十分不便，压缩之后压缩包也会分散在各个目录，十分的蓝廋难受，作为一名闲的蛋疼喜欢折腾又不会搜索独立自主的小白</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,858 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    
+
+    <title>略谈python中如何将图片转为pdf | 弈宇</title>
+    <meta property="og:title" content="略谈python中如何将图片转为pdf - 弈宇">
+    <meta property="og:type" content="article">
+        
+    <meta property="article:published_time" content='2023-11-13T21:19:08&#43;08:00'>
+        
+        
+    <meta property="article:modified_time" content='2023-11-13T21:19:08&#43;08:00'>
+        
+    <meta name="Keywords" content="Live2D,python,AI,深度学习">
+    <meta name="description" content="略谈python中如何将图片转为pdf">
+        
+    <meta name="author" content="弈宇者">
+    <meta property="og:url" content="https://zyx-31415.github.io/post/%E7%95%A5%E8%B0%88python%E4%B8%AD%E5%A6%82%E4%BD%95%E5%B0%86%E5%9B%BE%E7%89%87%E8%BD%AC%E4%B8%BApdf/">
+    <link rel="shortcut icon" href='/favicon.ico'  type="image/x-icon">
+
+    <link rel="stylesheet" href='/css/normalize.css'>
+    <link rel="stylesheet" href='/css/style.css'>
+    <script type="text/javascript" src="//cdn.bootcdn.net/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    
+    
+    
+    
+    
+    
+        <link rel="stylesheet" href='/css/douban.css'>
+    
+        <link rel="stylesheet" href='/css/other.css'>
+    
+</head>
+
+<body>
+    <header id="header" class="clearfix">
+    <div class="container">
+        <div class="col-group">
+            <div class="site-name ">
+                
+                    <a id="logo" href="https://zyx-31415.github.io">
+                        弈宇
+                    </a>
+                
+                <p class="description">学习各种计算机语言中</p>
+            </div>
+            <div>
+                <nav id="nav-menu" class="clearfix">
+                    <a class="current" href="https://zyx-31415.github.io">Home</a>
+                    
+                    <a  href="https://zyx-31415.github.io/archives/" title="归档">归档</a>
+                    
+                    <a  href="https://zyx-31415.github.io/about/" title="关于">关于</a>
+                    
+                </nav>
+            </div>
+        </div>
+    </div>
+</header>
+
+    <div id="body">
+        <div class="container">
+            <div class="col-group">
+
+                <div class="col-8" id="main">
+                    
+<div class="res-cons">
+    <style type="text/css">
+    .post-toc {
+        position: fixed;
+        width: 200px;
+        margin-left: -210px;
+        padding: 5px 10px;
+        font-family: Athelas, STHeiti, Microsoft Yahei, serif;
+        font-size: 12px;
+        border: 1px solid rgba(0, 0, 0, .07);
+        border-radius: 5px;
+        background-color: rgba(255, 255, 255, 0.98);
+        background-clip: padding-box;
+        -webkit-box-shadow: 1px 1px 2px rgba(0, 0, 0, .125);
+        box-shadow: 1px 1px 2px rgba(0, 0, 0, .125);
+        word-wrap: break-word;
+        white-space: nowrap;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+        z-index: 999;
+        cursor: pointer;
+        max-height: 70%;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    .post-toc .post-toc-title {
+        width: 100%;
+        margin: 0 auto;
+        font-size: 20px;
+        font-weight: 400;
+        text-transform: uppercase;
+        text-align: center;
+    }
+
+    .post-toc .post-toc-content {
+        font-size: 15px;
+    }
+
+    .post-toc .post-toc-content>nav>ul {
+        margin: 10px 0;
+    }
+
+    .post-toc .post-toc-content ul {
+        padding-left: 20px;
+        list-style: square;
+        margin: 0.5em;
+        line-height: 1.8em;
+    }
+
+    .post-toc .post-toc-content ul ul {
+        padding-left: 15px;
+        display: none;
+    }
+
+    @media print,
+    screen and (max-width:1057px) {
+        .post-toc {
+            display: none;
+        }
+    }
+</style>
+<div class="post-toc" style="position: absolute; top: 188px;">
+    <h2 class="post-toc-title">Table of Contents</h2>
+    <div class="post-toc-content">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1前言">1.前言</a></li>
+    <li><a href="#2代码">2.代码</a>
+      <ul>
+        <li><a href="#21总览">2.1总览</a></li>
+        <li><a href="#22详解">2.2详解</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        var postToc = $(".post-toc");
+        if (postToc.length) {
+            var leftPos = $("#main").offset().left;
+            if (leftPos < 220) {
+                postToc.css({ "width": leftPos - 10, "margin-left": (0 - leftPos) })
+            }
+
+            var t = postToc.offset().top - 20,
+                a = {
+                    start: {
+                        position: "absolute",
+                        top: t
+                    },
+                    process: {
+                        position: "fixed",
+                        top: 20
+                    },
+                };
+            $(window).scroll(function () {
+                var e = $(window).scrollTop();
+                e < t ? postToc.css(a.start) : postToc.css(a.process)
+            })
+        }
+
+        if ($("#TableOfContents").children().length < 1) {
+            $(".post-toc").remove();
+        }
+    })
+</script>
+    <article class="post">
+        <header>
+            <h1 class="post-title">略谈python中如何将图片转为pdf</h1>
+        </header>
+        
+  <time datetime="2023-11-13T13:19:08Z" class="post-meta meta-date dt-published">
+    2023-11-13
+  </time>
+
+
+<div class="post-meta meta-category">
+  <span>&nbsp;|</span>
+  
+    <a href='/categories/code' target="_blank">code</a>
+  
+</div>
+
+
+        
+        <div class="post-meta">
+            <span id="busuanzi_container_page_pv">&nbsp;|
+                <span id="busuanzi_value_page_pv"></span> <span>reads</span>
+            </span>
+        </div>
+        
+        
+        <div class="post-content">
+            <h1 id="略谈python中如何将图片转为pdf">略谈python中如何将图片转为pdf</h1>
+<h2 id="1前言">1.前言</h2>
+<p>有的时候，我们有多个目录且存在大量的图片，如图</p>
+<p>
+        <img class="mx-auto" alt="" src="/img/1113/00.png" />   
+    </p>
+<p>如果我们想要将每个目录合并为一个文件，一般人们会将其压缩为压缩包，但是这样子操作十分不便，压缩之后压缩包也会分散在各个目录，十分的<del>蓝廋</del>难受，作为一名<del>闲的蛋疼</del>喜欢折腾又<del>不会搜索</del>独立自主的小白，自然是自己写代码啦(主要是之前找到的软件太难用又有bug，只能自己在网上找资料了)</p>
+<h2 id="2代码">2.代码</h2>
+<h3 id="21总览">2.1总览</h3>
+<p>让我们看看项目的代码</p>
+<p>这是<code>main.py</code>的代码</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">import</span>  <span style="color:#555">api</span> <span style="color:#000;font-weight:bold">as</span> <span style="color:#555">a</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">def</span> <span style="color:#900;font-weight:bold">main</span>():
+</span></span><span style="display:flex;"><span>    _root_dir <span style="color:#000;font-weight:bold">=</span> <span style="color:#0086b3">input</span>(<span style="color:#d14">&#39;输入根目录&#39;</span>)
+</span></span><span style="display:flex;"><span>    re_dir_list <span style="color:#000;font-weight:bold">=</span> a<span style="color:#000;font-weight:bold">.</span>_find_all(_root_dir)
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic"># print(re_dir_list)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">for</span> <span style="color:#0086b3">dir</span> <span style="color:#000;font-weight:bold">in</span> re_dir_list:
+</span></span><span style="display:flex;"><span>        title <span style="color:#000;font-weight:bold">=</span> a<span style="color:#000;font-weight:bold">.</span>_get_title(<span style="color:#0086b3">dir</span>)
+</span></span><span style="display:flex;"><span>        a<span style="color:#000;font-weight:bold">.</span>_i2p(_root_dir,title,<span style="color:#0086b3">dir</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">if</span> __name__ <span style="color:#000;font-weight:bold">==</span> <span style="color:#d14">&#39;__main__&#39;</span>:
+</span></span><span style="display:flex;"><span>    main()
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>单独看这段代码毫无作用，重点是在下面的<code>api.py</code>的代码</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">36
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">37
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">38
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">39
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">import</span> <span style="color:#555">os</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">import</span> <span style="color:#555">img2pdf</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">def</span> <span style="color:#900;font-weight:bold">_t_files</span>(path):<span style="color:#998;font-style:italic"># 查找单一目录下所有文件与子目录</span>
+</span></span><span style="display:flex;"><span>    dirs <span style="color:#000;font-weight:bold">=</span> []
+</span></span><span style="display:flex;"><span>    files <span style="color:#000;font-weight:bold">=</span> []
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">for</span> item <span style="color:#000;font-weight:bold">in</span> os<span style="color:#000;font-weight:bold">.</span>scandir(path):
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">if</span> item<span style="color:#000;font-weight:bold">.</span>is_dir():
+</span></span><span style="display:flex;"><span>          dirs<span style="color:#000;font-weight:bold">.</span>append(item<span style="color:#000;font-weight:bold">.</span>path)
+</span></span><span style="display:flex;"><span>          <span style="color:#000;font-weight:bold">pass</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">elif</span> item<span style="color:#000;font-weight:bold">.</span>is_file():
+</span></span><span style="display:flex;"><span>          files<span style="color:#000;font-weight:bold">.</span>append(item<span style="color:#000;font-weight:bold">.</span>path)
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">pass</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">return</span> dirs,files
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">def</span> <span style="color:#900;font-weight:bold">_find_all</span>(<span style="color:#0086b3">dir</span>): <span style="color:#998;font-style:italic"># 递归查询最底层目录</span>
+</span></span><span style="display:flex;"><span>    temp_dirs,temp_files <span style="color:#000;font-weight:bold">=</span> _t_files(<span style="color:#0086b3">dir</span>)
+</span></span><span style="display:flex;"><span>    re_list <span style="color:#000;font-weight:bold">=</span> []
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> temp_dirs <span style="color:#000;font-weight:bold">==</span> []:
+</span></span><span style="display:flex;"><span>        re_list<span style="color:#000;font-weight:bold">.</span>append(<span style="color:#0086b3">dir</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">pass</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">else</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">for</span> dirs <span style="color:#000;font-weight:bold">in</span> temp_dirs:
+</span></span><span style="display:flex;"><span>            re_list<span style="color:#000;font-weight:bold">+=</span>_find_all(dirs)
+</span></span><span style="display:flex;"><span>            <span style="color:#000;font-weight:bold">pass</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">pass</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">return</span> re_list
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">def</span> <span style="color:#900;font-weight:bold">_get_title</span>(<span style="color:#0086b3">dir</span>): <span style="color:#998;font-style:italic"># 获得最底层目录名</span>
+</span></span><span style="display:flex;"><span>    t_title <span style="color:#000;font-weight:bold">=</span> <span style="color:#0086b3">dir</span><span style="color:#000;font-weight:bold">.</span>split(<span style="color:#d14">&#39;</span><span style="color:#d14">\\</span><span style="color:#d14">&#39;</span>)[<span style="color:#000;font-weight:bold">-</span><span style="color:#099">1</span>]
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">return</span> t_title
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">def</span> <span style="color:#900;font-weight:bold">_i2p</span>(root_dir,title,<span style="color:#0086b3">dir</span>): <span style="color:#998;font-style:italic"># 图片转pdf</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> os<span style="color:#000;font-weight:bold">.</span>path<span style="color:#000;font-weight:bold">.</span>exists(root_dir<span style="color:#000;font-weight:bold">+</span><span style="color:#d14">&#39;</span><span style="color:#d14">\\</span><span style="color:#d14">pdf&#39;</span>) <span style="color:#000;font-weight:bold">==</span> <span style="color:#000;font-weight:bold">False</span>:
+</span></span><span style="display:flex;"><span>        os<span style="color:#000;font-weight:bold">.</span>mkdir(root_dir<span style="color:#000;font-weight:bold">+</span><span style="color:#d14">&#39;</span><span style="color:#d14">\\</span><span style="color:#d14">pdf&#39;</span>)
+</span></span><span style="display:flex;"><span>    t_dir,file <span style="color:#000;font-weight:bold">=</span> _t_files(<span style="color:#0086b3">dir</span>)
+</span></span><span style="display:flex;"><span>    file_name <span style="color:#000;font-weight:bold">=</span> root_dir<span style="color:#000;font-weight:bold">+</span><span style="color:#d14">&#39;</span><span style="color:#d14">\\</span><span style="color:#d14">pdf</span><span style="color:#d14">\\</span><span style="color:#d14">&#39;</span><span style="color:#000;font-weight:bold">+</span>title<span style="color:#000;font-weight:bold">+</span><span style="color:#d14">&#39;.pdf&#39;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#0086b3">print</span>(title)
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">with</span> <span style="color:#0086b3">open</span>(file_name,<span style="color:#d14">&#39;wb&#39;</span>) <span style="color:#000;font-weight:bold">as</span> f:
+</span></span><span style="display:flex;"><span>        f<span style="color:#000;font-weight:bold">.</span>write(img2pdf<span style="color:#000;font-weight:bold">.</span>convert(file))
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这是整个项目的核心(废话，整个项目就两个文件)，接下来让我们详细将这些代码细细刨析一下。</p>
+<hr>
+<h3 id="22详解">2.2详解</h3>
+<p>整个项目分为分割可复用功能的<code>api.py</code>与整合功能的<code>main.py</code>，项目存在的优点与不足如下</p>
+<hr>
+<h4 id="优点就别在自己脸上贴金了吧">优点~~(就别在自己脸上贴金了吧)~~</h4>
+<p>可复用</p>
+<p>思路清晰</p>
+<p>可读程度高</p>
+<h4 id="缺点不足">缺点/不足</h4>
+<p>未进行报错处理~~(主要是自己用，有什么报错自己修，也不会遇上炒饭，笑)~~</p>
+<p>未进行文件类别分筛~~(实在是懒得写了，一个everything就可以提前处理了)~~</p>
+<hr>
+<p>好了，让我们开始详细分析吧</p>
+<hr>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">import</span>  <span style="color:#555">api</span> <span style="color:#000;font-weight:bold">as</span> <span style="color:#555">a</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">def</span> <span style="color:#900;font-weight:bold">main</span>():
+</span></span><span style="display:flex;"><span>    _root_dir <span style="color:#000;font-weight:bold">=</span> <span style="color:#0086b3">input</span>(<span style="color:#d14">&#39;输入根目录&#39;</span>)
+</span></span><span style="display:flex;"><span>    re_dir_list <span style="color:#000;font-weight:bold">=</span> a<span style="color:#000;font-weight:bold">.</span>_find_all(_root_dir)
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic"># print(re_dir_list)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">for</span> <span style="color:#0086b3">dir</span> <span style="color:#000;font-weight:bold">in</span> re_dir_list:
+</span></span><span style="display:flex;"><span>        title <span style="color:#000;font-weight:bold">=</span> a<span style="color:#000;font-weight:bold">.</span>_get_title(<span style="color:#0086b3">dir</span>)
+</span></span><span style="display:flex;"><span>        a<span style="color:#000;font-weight:bold">.</span>_i2p(_root_dir,title,<span style="color:#0086b3">dir</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">if</span> __name__ <span style="color:#000;font-weight:bold">==</span> <span style="color:#d14">&#39;__main__&#39;</span>:
+</span></span><span style="display:flex;"><span>    main()
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>main.py</code>这个文件主要是调用<code>api.py</code>中的各种函数，提供输入并串联各函数以进行处理。对于我们来说，逐行与<code>api.py</code>中的函数对照分析是个很好的分析思路</p>
+<hr>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">import</span>  <span style="color:#555">api</span> <span style="color:#000;font-weight:bold">as</span> <span style="color:#555">a</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">def</span> <span style="color:#900;font-weight:bold">main</span>():
+</span></span><span style="display:flex;"><span>    _root_dir <span style="color:#000;font-weight:bold">=</span> <span style="color:#0086b3">input</span>(<span style="color:#d14">&#39;输入根目录&#39;</span>)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这几行不是重点，就不说了</p>
+<hr>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>re_dir_list <span style="color:#000;font-weight:bold">=</span> a<span style="color:#000;font-weight:bold">.</span>_find_all(_root_dir)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这段代码对应的函数如下</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">def</span> <span style="color:#900;font-weight:bold">_find_all</span>(<span style="color:#0086b3">dir</span>): <span style="color:#998;font-style:italic"># 递归查询最底层目录</span>
+</span></span><span style="display:flex;"><span>    temp_dirs,temp_files <span style="color:#000;font-weight:bold">=</span> _t_files(<span style="color:#0086b3">dir</span>)
+</span></span><span style="display:flex;"><span>    re_list <span style="color:#000;font-weight:bold">=</span> []
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> temp_dirs <span style="color:#000;font-weight:bold">==</span> []:
+</span></span><span style="display:flex;"><span>        re_list<span style="color:#000;font-weight:bold">.</span>append(<span style="color:#0086b3">dir</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">pass</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">else</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">for</span> dirs <span style="color:#000;font-weight:bold">in</span> temp_dirs:
+</span></span><span style="display:flex;"><span>            re_list<span style="color:#000;font-weight:bold">+=</span>_find_all(dirs)
+</span></span><span style="display:flex;"><span>            <span style="color:#000;font-weight:bold">pass</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">pass</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">return</span> re_list
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>功能在函数里面已经说明了，就是查找到<code>dir</code>目录下最底层的所有目录并返回列表<code>re_list</code>，在讲这个函数之前，我们得先看这个，<code>temp_dirs,temp_files = _t_files(dir)</code>，这行代码所指向的是这个函数</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">def</span> <span style="color:#900;font-weight:bold">_t_files</span>(path):<span style="color:#998;font-style:italic"># 查找单一目录下所有文件与子目录</span>
+</span></span><span style="display:flex;"><span>    dirs <span style="color:#000;font-weight:bold">=</span> []
+</span></span><span style="display:flex;"><span>    files <span style="color:#000;font-weight:bold">=</span> []
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">for</span> item <span style="color:#000;font-weight:bold">in</span> os<span style="color:#000;font-weight:bold">.</span>scandir(path):
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">if</span> item<span style="color:#000;font-weight:bold">.</span>is_dir():
+</span></span><span style="display:flex;"><span>          dirs<span style="color:#000;font-weight:bold">.</span>append(item<span style="color:#000;font-weight:bold">.</span>path)
+</span></span><span style="display:flex;"><span>          <span style="color:#000;font-weight:bold">pass</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">elif</span> item<span style="color:#000;font-weight:bold">.</span>is_file():
+</span></span><span style="display:flex;"><span>          files<span style="color:#000;font-weight:bold">.</span>append(item<span style="color:#000;font-weight:bold">.</span>path)
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">pass</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">return</span> dirs,files
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>函数的主要意思是用<code>os.scandir</code>读取一个目录下所有的对象(包括文件与目录)，并用<code>is_dir()</code>与<code>is_file()</code>将它们分类，最后分别返回包含文件与目录路径的列表。</p>
+<p>好了，我们现在有了<code>temp_dirs</code>,<code>temp_files</code>两个列表，现在开始判断，先用<code>re_list = []</code>初始化一个临时列表，然后开始进入if语句</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">if</span> temp_dirs <span style="color:#000;font-weight:bold">==</span> []:
+</span></span><span style="display:flex;"><span>        re_list<span style="color:#000;font-weight:bold">.</span>append(<span style="color:#0086b3">dir</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">pass</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这个还算简单，就是如果<code>temp_dirs</code>这个列表是空的，那返回的列表就是我们的输入<code>dir</code></p>
+<p>但是接下来的<code>else</code>就不一样了</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">for</span> dirs <span style="color:#000;font-weight:bold">in</span> temp_dirs:
+</span></span><span style="display:flex;"><span>            re_list<span style="color:#000;font-weight:bold">+=</span>_find_all(dirs)
+</span></span><span style="display:flex;"><span>            <span style="color:#000;font-weight:bold">pass</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">pass</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>首先，用<code>for dirs in temp_dirs</code>遍历<code>temp_dirs</code>列表，然后进入递归，这也是这段函数甚至整个项目的最难点，<code>re_list+=_find_all(dirs)</code>，让我们开始推理</p>
+<p>假设A目录下有A.1，A.2等目录，在对<code>A</code>使用<code>_find_all</code>函数后，我们会获得<code>temp_dirs = [A.1,A.2,...]</code>，自然，A不是最底层目录(即只有文件的目录)，那A.1，A.2呢，让我们继续向下思考，如果我们<code>_fin_all(A.1)</code>，则有两种可能</p>
+<ol>
+<li>返回<code>temp_dirs = [A.1.1,A.1.2,...]</code></li>
+<li>返回<code>temp_dirs = []</code></li>
+</ol>
+<p>如果是状况1，则我们可以继续执行<code>_find_all(A.1.1)</code>……</p>
+<p>如果是状况2，则<code>A.1</code>就是最底层目录</p>
+<p>那么，在函数执行完后，父目录的<code>re_list</code>等于各子目录的<code>re_list</code>之和等于子目录的子目录的<code>re_list</code>……直至最后<code>re_list</code>等于自己的最底层目录</p>
+<p>OK，<code>re_dir_list = a._find_all(_root_dir)</code>已经分析完了，让我们继续</p>
+<hr>
+<p>我们已经获取了所有的最底层目录的列表<code>re_dir_list</code>，接下来遍历列表中的每一项，即每一个最底层目录</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>        title <span style="color:#000;font-weight:bold">=</span> a<span style="color:#000;font-weight:bold">.</span>_get_title(<span style="color:#0086b3">dir</span>)
+</span></span><span style="display:flex;"><span>        a<span style="color:#000;font-weight:bold">.</span>_i2p(_root_dir,title,<span style="color:#0086b3">dir</span>)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>_get_title</code>函数指向的是这段代码</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">def</span> <span style="color:#900;font-weight:bold">_get_title</span>(<span style="color:#0086b3">dir</span>): <span style="color:#998;font-style:italic"># 获得最底层目录名</span>
+</span></span><span style="display:flex;"><span>    t_title <span style="color:#000;font-weight:bold">=</span> <span style="color:#0086b3">dir</span><span style="color:#000;font-weight:bold">.</span>split(<span style="color:#d14">&#39;</span><span style="color:#d14">\\</span><span style="color:#d14">&#39;</span>)[<span style="color:#000;font-weight:bold">-</span><span style="color:#099">1</span>]
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">return</span> t_title
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>主要功能是获取该目录的目录名，在<code>re_dir_list</code>中，列表中的目录格式如下<code>D:\code\github\……</code>，如果我们要将每一个最底层目录中的图片合并成一个pdf文件，名称取最底层目录的目录名，则我们可以通过<code>split()</code>语句分割出各目录的目录名，并且取出最底层目录的名称<code>t_title</code>。</p>
+<p>最后则是<code>_i2P(_root_dir,title,dir)</code>，指向的是这段</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">def</span> <span style="color:#900;font-weight:bold">_i2p</span>(root_dir,title,<span style="color:#0086b3">dir</span>): <span style="color:#998;font-style:italic"># 图片转pdf</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> os<span style="color:#000;font-weight:bold">.</span>path<span style="color:#000;font-weight:bold">.</span>exists(root_dir<span style="color:#000;font-weight:bold">+</span><span style="color:#d14">&#39;</span><span style="color:#d14">\\</span><span style="color:#d14">pdf&#39;</span>) <span style="color:#000;font-weight:bold">==</span> <span style="color:#000;font-weight:bold">False</span>:
+</span></span><span style="display:flex;"><span>        os<span style="color:#000;font-weight:bold">.</span>mkdir(root_dir<span style="color:#000;font-weight:bold">+</span><span style="color:#d14">&#39;</span><span style="color:#d14">\\</span><span style="color:#d14">pdf&#39;</span>)
+</span></span><span style="display:flex;"><span>    t_dir,file <span style="color:#000;font-weight:bold">=</span> _t_files(<span style="color:#0086b3">dir</span>)
+</span></span><span style="display:flex;"><span>    file_name <span style="color:#000;font-weight:bold">=</span> root_dir<span style="color:#000;font-weight:bold">+</span><span style="color:#d14">&#39;</span><span style="color:#d14">\\</span><span style="color:#d14">pdf</span><span style="color:#d14">\\</span><span style="color:#d14">&#39;</span><span style="color:#000;font-weight:bold">+</span>title<span style="color:#000;font-weight:bold">+</span><span style="color:#d14">&#39;.pdf&#39;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#0086b3">print</span>(title)
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">with</span> <span style="color:#0086b3">open</span>(file_name,<span style="color:#d14">&#39;wb&#39;</span>) <span style="color:#000;font-weight:bold">as</span> f:
+</span></span><span style="display:flex;"><span>        f<span style="color:#000;font-weight:bold">.</span>write(img2pdf<span style="color:#000;font-weight:bold">.</span>convert(file))
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>首先是</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> os<span style="color:#000;font-weight:bold">.</span>path<span style="color:#000;font-weight:bold">.</span>exists(root_dir<span style="color:#000;font-weight:bold">+</span><span style="color:#d14">&#39;</span><span style="color:#d14">\\</span><span style="color:#d14">pdf&#39;</span>) <span style="color:#000;font-weight:bold">==</span> <span style="color:#000;font-weight:bold">False</span>:
+</span></span><span style="display:flex;"><span>        os<span style="color:#000;font-weight:bold">.</span>mkdir(root_dir<span style="color:#000;font-weight:bold">+</span><span style="color:#d14">&#39;</span><span style="color:#d14">\\</span><span style="color:#d14">pdf&#39;</span>)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这段的功能是检测<code>root_dir</code>下是否存在<code>pdf</code>目录存放生成的pdf文件，如没有便进行创建</p>
+<p>然后<code>t_dir,file = _t_files(dir)</code>，主要是获取<code>dir</code>目录下所有的文件列表<code>file</code>，以便接下来的处理</p>
+<p>接下来是<code>file_name = root_dir+'\\pdf\\'+title+'.pdf'</code>，这段是拼接生成的pdf文件的整个文件路径</p>
+<p>最后是这一段</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">with</span> <span style="color:#0086b3">open</span>(file_name,<span style="color:#d14">&#39;wb&#39;</span>) <span style="color:#000;font-weight:bold">as</span> f:
+</span></span><span style="display:flex;"><span>        f<span style="color:#000;font-weight:bold">.</span>write(img2pdf<span style="color:#000;font-weight:bold">.</span>convert(file))
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>创建<code>file_name</code>指向的pdf文件，然后以二进制格式打开，最后写入用<code>img2pdf.convert(file)</code>生成的pdf的二进制数据，</p>
+<h1 id="3总结">3.总结</h1>
+<p>这个项目主要实现的是在一个目录下获取所有最底层目录并将其中的图片合并为pdf文件，主要难点是如何通过循环获取最底层目录。至于我为什么要写这个程序吗……欸嘿。</p>
+
+        </div>
+
+        
+<div class="post-archive">
+    <ul class="post-copyright">
+        <li><strong>Author: </strong><a rel="author" href="https://zyx-31415.github.io">弈宇者</a></li>
+        <li style="word-break:break-all"><strong>Link: </strong><a href="https://zyx-31415.github.io/post/%E7%95%A5%E8%B0%88python%E4%B8%AD%E5%A6%82%E4%BD%95%E5%B0%86%E5%9B%BE%E7%89%87%E8%BD%AC%E4%B8%BApdf/">https://zyx-31415.github.io/post/%E7%95%A5%E8%B0%88python%E4%B8%AD%E5%A6%82%E4%BD%95%E5%B0%86%E5%9B%BE%E7%89%87%E8%BD%AC%E4%B8%BApdf/</a></li>
+        <li><strong>License: </strong>This work is under a <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/">知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议</a>. Kindly fulfill the requirements of the aforementioned License when adapting or creating a derivative of this work.</li>
+    </ul>
+</div>
+<br/>
+
+
+
+        
+
+<div class="post-archive">
+    <h2>See Also</h2>
+    <ul class="listing">
+        
+        <li><a href="/post/%E5%85%B3%E4%BA%8E%E4%BD%BF%E7%94%A8ebooklib%E8%BF%9B%E8%A1%8C%E5%A4%9A%E4%B8%AAtxt%E8%BD%ACepub%E5%8F%8Aepub%E5%90%88%E5%B9%B6%E4%B8%8E%E8%BF%BD%E5%8A%A0%E6%97%B6%E9%81%87%E5%88%B0%E7%9A%84%E5%B0%8F%E9%97%AE%E9%A2%98/">关于使用ebooklib进行多个txt转epub及epub合并与追加时遇到的小问题</a></li>
+        
+        <li><a href="/post/vscode%E5%8F%8Aconda%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE/">Vscode及conda超小白环境配置教程</a></li>
+        
+        <li><a href="/post/Hello_world/">Hello_world</a></li>
+        
+        <li><a href="/about/">关于我</a></li>
+        
+        <li><a href="/archives/">归档</a></li>
+        
+    </ul>
+</div>
+
+
+        <div class="post-meta meta-tags">
+            
+            <ul class="clearfix">
+                
+                <li><a href='/tags/pdf' target="_blank">pdf</a></li>
+                
+                <li><a href='/tags/python' target="_blank">python</a></li>
+                
+                <li><a href='/tags/img2pdf' target="_blank">img2pdf</a></li>
+                
+                <li><a href='/tags/%E5%9B%BE%E7%89%87%E8%BD%ACpdf' target="_blank">图片转pdf</a></li>
+                
+            </ul>
+            
+        </div>
+    </article>
+    
+    
+
+    
+    
+    
+    
+
+</div>
+
+                    <footer id="footer">
+    <div>
+        &copy; 2023 <a href="https://zyx-31415.github.io">弈宇 By 弈宇者</a>
+        
+    </div>
+    <br />
+    <div>
+        <div class="github-badge">
+            <a href="https://gohugo.io/" target="_black" rel="nofollow"><span class="badge-subject">Powered by</span><span class="badge-value bg-blue">Hugo</span></a>
+        </div>
+        <div class="github-badge">
+            <a href="https://www.flysnow.org/" target="_black"><span class="badge-subject">Design by</span><span class="badge-value bg-brightgreen">飞雪无情</span></a>
+        </div>
+        <div class="github-badge">
+            <a href="https://github.com/flysnow-org/maupassant-hugo" target="_black"><span class="badge-subject">Theme</span><span class="badge-value bg-yellowgreen">Maupassant</span></a>
+        </div>
+    </div>
+</footer>
+
+
+    
+    
+    <script type="text/javascript">
+        window.MathJax = {
+            tex2jax: {
+                inlineMath: [['$', '$']],
+                processEscapes: true
+                }
+            };
+    </script>
+    <script src='//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+
+<a id="rocket" href="#top"></a>
+<script type="text/javascript" src='/js/totop.js?v=0.0.0' async=""></script>
+<style type="text/css">
+div.highlight {
+    position: relative;
+    margin: 1em 0px;
+}
+
+.copy-code {
+    display: none;
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    color: rgba(255, 255, 255, 0.8);
+    background: rgba(78, 78, 78, 0.8);
+    border-radius: var(--radius);
+    padding: 0 5px;
+    font: inherit;
+    user-select: none;
+    cursor: pointer;
+    border: 0;
+    --radius: 8px;
+}
+
+div.highlight:hover .copy-code,pre:hover .copy-code {
+    display: block;
+}
+
+</style>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+
+
+    <script type="text/javascript" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async></script>
+
+
+
+
+    <script src='/js/douban.js'></script>
+
+                </div>
+
+                <div id="secondary">
+    <section class="widget">
+        <form id="search" action='https://zyx-31415.github.io/search' method="get" accept-charset="utf-8" target="_blank" _lpchecked="1">
+      
+      <input type="text" name="q" maxlength="20" placeholder="Search">
+      <input type="hidden" name="sitesearch" value="https://zyx-31415.github.io">
+      <button type="submit" class="submit icon-search"></button>
+</form>
+    </section>
+
+    <section class="widget">
+        <h3 class="widget-title">Latest articles</h3>
+<ul class="widget-list">
+    
+    <li>
+        <a href="https://zyx-31415.github.io/post/%E7%95%A5%E8%B0%88python%E4%B8%AD%E5%A6%82%E4%BD%95%E5%B0%86%E5%9B%BE%E7%89%87%E8%BD%AC%E4%B8%BApdf/" title="略谈python中如何将图片转为pdf" target="_blank">略谈python中如何将图片转为pdf</a>
+    </li>
+    
+    <li>
+        <a href="https://zyx-31415.github.io/post/%E5%85%B3%E4%BA%8E%E4%BD%BF%E7%94%A8ebooklib%E8%BF%9B%E8%A1%8C%E5%A4%9A%E4%B8%AAtxt%E8%BD%ACepub%E5%8F%8Aepub%E5%90%88%E5%B9%B6%E4%B8%8E%E8%BF%BD%E5%8A%A0%E6%97%B6%E9%81%87%E5%88%B0%E7%9A%84%E5%B0%8F%E9%97%AE%E9%A2%98/" title="关于使用ebooklib进行多个txt转epub及epub合并与追加时遇到的小问题" target="_blank">关于使用ebooklib进行多个txt转epub及epub合并与追加时遇到的小问题</a>
+    </li>
+    
+    <li>
+        <a href="https://zyx-31415.github.io/post/vscode%E5%8F%8Aconda%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE/" title="Vscode及conda超小白环境配置教程" target="_blank">Vscode及conda超小白环境配置教程</a>
+    </li>
+    
+    <li>
+        <a href="https://zyx-31415.github.io/post/Hello_world/" title="Hello_world" target="_blank">Hello_world</a>
+    </li>
+    
+</ul>
+    </section>
+
+    
+
+    <section class="widget">
+        <h3 class="widget-title"><a href='/categories/'>Categories</a></h3>
+<ul class="widget-list">
+    
+    <li><a href="https://zyx-31415.github.io/categories/code/">code (3)</a></li>
+    
+</ul>
+    </section>
+
+    <section class="widget">
+        <h3 class="widget-title"><a href='/tags/'>Tags</a></h3>
+<div class="tagcloud">
+    
+    <a href="https://zyx-31415.github.io/tags/conda/">conda</a>
+    
+    <a href="https://zyx-31415.github.io/tags/ebooklib/">ebooklib</a>
+    
+    <a href="https://zyx-31415.github.io/tags/epub/">epub</a>
+    
+    <a href="https://zyx-31415.github.io/tags/img2pdf/">img2pdf</a>
+    
+    <a href="https://zyx-31415.github.io/tags/pdf/">pdf</a>
+    
+    <a href="https://zyx-31415.github.io/tags/python/">python</a>
+    
+    <a href="https://zyx-31415.github.io/tags/txt%E8%BD%ACepub/">txt转epub</a>
+    
+    <a href="https://zyx-31415.github.io/tags/vscode/">vscode</a>
+    
+    <a href="https://zyx-31415.github.io/tags/%E5%9B%BE%E7%89%87%E8%BD%ACpdf/">图片转pdf</a>
+    
+    <a href="https://zyx-31415.github.io/tags/%E5%B0%8F%E7%99%BD/">小白</a>
+    
+    <a href="https://zyx-31415.github.io/tags/%E7%8E%AF%E5%A2%83%E5%AE%89%E8%A3%85/">环境安装</a>
+    
+</div>
+    </section>
+
+    
+<section class="widget">
+    <h3 class="widget-title">Links</h3>
+    <ul class="widget-list">
+        
+        <li>
+            <a target="_blank" href="" title=""></a>
+        </li>
+        
+    </ul>
+</section>
+
+
+    <section class="widget">
+        <h3 class="widget-title">Meta</h3>
+        <ul class="widget-list">
+            <li><a href="https://zyx-31415.github.io/index.xml">RSS</a></li>
+        </ul>
+    </section>
+</div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
